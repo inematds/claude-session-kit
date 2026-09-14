@@ -134,7 +134,7 @@
   <p class="sub">O modelo não enxerga a própria cota. A barra enxerga. As skills usam o que a barra mostra pra decidir quando compactar, auditar ou entregar a sessão pro próximo agente.</p>
   <div class="grid g3">
     <div class="card"><h3>📊 Statusline com cota real</h3><p>Lê o endpoint oficial de uso e mostra <code>ctx</code>, <code>5h</code>, <code>w</code> (semanal geral) e <code>F</code> (semanal do modelo em uso, com <code>!</code> em alerta). Cache de 300 s pra não martelar a API.</p></div>
-    <div class="card"><h3>🧩 Skills de sessão</h3><p><code>session-statusline</code> (checkpoint), <code>memory-audit</code> (o que manter, comprimir, apagar) e <code>session-handoff</code> (resumo pro próximo agente). Todas chat-only, sem inventar estado.</p></div>
+    <div class="card"><h3>🧩 Skills de sessão</h3><p><code>session-statusline</code> (checkpoint), <code>memory-audit</code> (o que manter, comprimir, apagar) e <code>session-handoff</code> (resumo pro próximo agente). De apoio: <code>maestro-roteador</code> (modelo e esforço) e <code>fable-mindset</code> (playbook a partir dos logs).</p></div>
     <div class="card"><h3>🗺️ Plano de otimização</h3><p>Gatilhos lidos direto da barra: ctx 40/60/80 %, cota de 5 h, cota por modelo. Regras de higiene e o que medir pra saber se está funcionando.</p></div>
   </div>
 </div></section>
@@ -209,10 +209,11 @@
   </div></div>
 
   <div class="step"><div class="b">5</div><div>
-    <h3>Instale as três skills</h3>
+    <h3>Instale as skills</h3>
     <p>Copie as pastas pra <code>~/.claude/skills/</code>, ou cole <code>skills/PROMPT-instalar.md</code> numa sessão.</p>
 <pre><span class="k">cp -r</span> skills/session-statusline skills/memory-audit skills/session-handoff ~/.claude/skills/
-<span class="k">ls</span> ~/.claude/skills | <span class="k">grep</span> -E <span class="s">'session|memory'</span></pre>
+<span class="k">cp -r</span> skills/maestro-roteador skills/fable-mindset ~/.claude/skills/   <span class="c"># apoio: modelo/esforço e playbook</span>
+<span class="k">ls</span> ~/.claude/skills | <span class="k">grep</span> -E <span class="s">'session|memory|maestro|fable'</span></pre>
   </div></div>
 
   <div class="step"><div class="b">6</div><div>
@@ -220,7 +221,9 @@
     <p>Diga estas frases dentro da sessão. Cada uma dispara a skill certa.</p>
 <pre><span class="k">checkpoint</span>            <span class="c"># ou "onde estamos" → session-statusline</span>
 <span class="k">analise a memória</span>     <span class="c"># ou "memória inchada" → memory-audit</span>
-<span class="k">handoff</span>               <span class="c"># ou "vou dar /clear" → session-handoff, depois /clear e cole o resumo</span></pre>
+<span class="k">handoff</span>               <span class="c"># ou "vou dar /clear" → session-handoff, depois /clear e cole o resumo</span>
+<span class="k">qual modelo uso?</span>      <span class="c"># quando F: está com "!" → maestro-roteador</span>
+<span class="k">analisar minhas sessões</span> <span class="c"># playbook por modelo a partir dos JSONL → fable-mindset</span></pre>
   </div></div>
 </div></section>
 
@@ -232,8 +235,9 @@
     <div class="card"><h3>ctx 40–60 %</h3><p><strong>checkpoint</strong>. Decide se compacta agora ou segue.</p></div>
     <div class="card"><h3>ctx &gt; 60 % ou saída repetitiva</h3><p><strong>memory-audit</strong> → aplicar o plano de enxugamento → <code>/compact</code>.</p></div>
     <div class="card"><h3>ctx &gt; 80 %</h3><p><strong>handoff</strong> → <code>/clear</code> → colar o handoff na sessão nova.</p></div>
-    <div class="card"><h3>F: com "!"</h3><p>Trocar de modelo pra tarefas mecânicas (<code>/model</code>) ou esperar o reset indicado na barra.</p></div>
+    <div class="card"><h3>F: com "!"</h3><p><code>maestro-roteador</code> decide o que vai pra modelo mais barato (<code>/model</code> ou subagente). O resto espera o reset indicado na barra.</p></div>
   </div>
+  <p class="sub" style="margin-top:28px">A teoria por trás do kit é o curso <a href="https://inematds.github.io/cctop/" target="_blank" rel="noopener">Mestre em Contexto e Tokens</a>: releitura de contexto, prompt caching, rotina de <code>/clear</code> e <code>/compact</code>, handoff e subagentes. Plugins compatíveis com o ciclo (não incluídos): context-mode, claude-mem, claudex.</p>
 </div></section>
 
 <section id="roadmap"><div class="wrap">

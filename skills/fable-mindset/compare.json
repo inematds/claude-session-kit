@@ -1,0 +1,124 @@
+{
+  "a": {
+    "model": "claude-fable-5",
+    "sessions": 7,
+    "assistant_turns": 69,
+    "assistant_lines": 950,
+    "human_turns": 128,
+    "thinking_turns": 68,
+    "thinking_ratio": 0.986,
+    "total_tool_calls": 453,
+    "avg_tools_per_turn": 6.57,
+    "median_tools_per_turn": 4.0,
+    "read_before_edit_ratio": 0.34,
+    "test_after_edit_ratio": 0.0,
+    "sessions_with_edit": 7,
+    "top_tools": [
+      [
+        "Bash",
+        199
+      ],
+      [
+        "Read",
+        95
+      ],
+      [
+        "Write",
+        60
+      ],
+      [
+        "Edit",
+        37
+      ],
+      [
+        "mcp__plugin_context-mode_context-mode__ctx_execute",
+        25
+      ],
+      [
+        "Agent",
+        20
+      ],
+      [
+        "ToolSearch",
+        9
+      ],
+      [
+        "Skill",
+        5
+      ],
+      [
+        "mcp__plugin_context-mode_context-mode__ctx_batch_execute",
+        2
+      ],
+      [
+        "Monitor",
+        1
+      ]
+    ]
+  },
+  "b": {
+    "model": "claude-opus-4-8",
+    "sessions": 1183,
+    "assistant_turns": 2493,
+    "assistant_lines": 41620,
+    "human_turns": 2730,
+    "thinking_turns": 1335,
+    "thinking_ratio": 0.535,
+    "total_tool_calls": 19901,
+    "avg_tools_per_turn": 7.98,
+    "median_tools_per_turn": 6.0,
+    "read_before_edit_ratio": 0.371,
+    "test_after_edit_ratio": 0.023,
+    "sessions_with_edit": 427,
+    "top_tools": [
+      [
+        "Bash",
+        6089
+      ],
+      [
+        "Read",
+        3715
+      ],
+      [
+        "Edit",
+        1794
+      ],
+      [
+        "Write",
+        1610
+      ],
+      [
+        "ToolSearch",
+        1241
+      ],
+      [
+        "WebSearch",
+        1003
+      ],
+      [
+        "mcp__plugin_context-mode_context-mode__ctx_execute",
+        831
+      ],
+      [
+        "WebFetch",
+        754
+      ],
+      [
+        "StructuredOutput",
+        743
+      ],
+      [
+        "Agent",
+        632
+      ],
+      [
+        "mcp__plugin_context-mode_context-mode__ctx_search",
+        341
+      ],
+      [
+        "mcp__plugin_context-mode_context-mode__ctx_fetch_and_index",
+        270
+      ]
+    ]
+  }
+}
