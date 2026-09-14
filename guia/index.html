@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Session Kit — statusline com cota real + skills de sessão</title>
+<meta name="description" content="Kit pra manter sessões do Claude Code enxutas: statusline com cota de 5h, semanal e por modelo, skills de checkpoint, auditoria de memória e handoff, e o plano que liga tudo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0c0c10; --bg2:#14141b; --card:#16161e; --line:#272730;
+    --txt:#e9e9ee; --mut:#9a9aa6; --amb:#E2A23B; --amb2:#f0c070; --sky:#38bdf8; --pro:#cbd5e1;
+    color-scheme:dark;
+  }
+  body.light{
+    --bg:#f6f7f9; --bg2:#eceef2; --card:#ffffff; --line:#e1e3ea;
+    --txt:#1a1a22; --mut:#5b5b68; --amb:#b9791d; --amb2:#a16207; --sky:#0369a1; --pro:#b45309;
+    color-scheme:light;
+  }
+  body.light .hero .glow{opacity:.5}
+  body.light pre{background:#0e0e14;color:#d6d6e0}
+  body.light pre .c{color:#8a8a98}
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.65 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{font-family:Sora,sans-serif;line-height:1.15;margin:0}
+  a{color:var(--amb);text-decoration:none}
+  code,pre{font-family:"JetBrains Mono",monospace}
+  .wrap{max-width:1160px;margin:0 auto;padding:0 22px}
+  .mut{color:var(--mut)} .amb{color:var(--amb)}
+  .chip{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--amb);font-weight:600;font-family:Sora}
+  nav{position:sticky;top:0;z-index:30;backdrop-filter:blur(12px);background:rgba(12,12,16,.78);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:22px;height:60px}
+  nav .brand{display:flex;align-items:center;gap:8px;font-family:Sora;font-weight:800;letter-spacing:-.02em;color:var(--amb)}
+  nav .brand .emoji{font-size:1.25rem}
+  nav .sep{color:var(--mut);opacity:.45}
+  nav .inema{color:var(--sky);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .inema:hover{filter:brightness(1.15)}
+  nav .pro{color:var(--pro);font-weight:600;font-size:.88rem;font-family:Sora}
+  nav .pro:hover{filter:brightness(1.15)}
+  nav .clubpro{display:inline-flex;align-items:center;gap:6px}
+  nav .links{margin-left:auto;display:flex;align-items:center;gap:20px;font-size:.92rem}
+  nav .links a.sec{color:var(--mut)} nav .links a.sec:hover{color:var(--txt)}
+  .tgl{background:var(--bg2);border:1px solid var(--line);color:var(--txt);width:38px;height:38px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .tgl:hover{border-color:var(--amb)}
+  .btn{display:inline-block;background:var(--amb);color:#1a1206;font-weight:600;padding:.6em 1.05em;border-radius:10px;font-family:Sora}
+  .btn.ghost{background:transparent;color:var(--txt);border:1px solid var(--line)}
+  @media(max-width:760px){nav .links a.sec{display:none}}
+  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .hero .glow{position:absolute;inset:-40% -20% auto auto;width:70%;height:600px;background:radial-gradient(closest-side,rgba(226,162,59,.22),transparent 70%);pointer-events:none}
+  .hero .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:74px 22px}
+  .hero h1{font-size:clamp(2.2rem,5vw,3.5rem);font-weight:800;letter-spacing:-.025em}
+  .hero p.lead{font-size:1.18rem;color:var(--mut);margin:1.1em 0 1.6em;max-width:34ch}
+  .hero .cta{display:flex;gap:12px;flex-wrap:wrap}
+  .hero figure{margin:0;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px -30px #000}
+  .hero figure img{width:100%;display:block}
+  @media(max-width:780px){.hero .wrap{grid-template-columns:1fr;padding:48px 22px}}
+  section{padding:62px 0;border-bottom:1px solid var(--line)}
+  section h2{font-size:clamp(1.5rem,3.4vw,2.1rem);font-weight:800;letter-spacing:-.02em}
+  section .sub{color:var(--mut);margin:.6em 0 2em;max-width:62ch}
+  .grid{display:grid;gap:16px}
+  .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+  @media(max-width:820px){.g3,.g4{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card h3{font-size:1.05rem;margin-bottom:.4em}
+  .card p{color:var(--mut);font-size:.92rem;margin:0}
+  .num{display:inline-flex;width:30px;height:30px;align-items:center;justify-content:center;border-radius:8px;background:rgba(226,162,59,.14);color:var(--amb);font-family:Sora;font-weight:800;font-size:.9rem;margin-bottom:.7em}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:10px}
+  .flow span{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:.45em .9em;font-size:.85rem;font-family:Sora;font-weight:600}
+  .flow .arr{color:var(--amb);border:none;background:none;padding:0 .1em}
+  pre{background:#0a0a0e;border:1px solid var(--line);border-radius:12px;padding:16px 18px;overflow:auto;font-size:.86rem;line-height:1.6;color:#d6d6e0}
+  pre .c{color:#6f6f7c} pre .k{color:var(--amb2)} pre .s{color:#9ece6a}
+  .step{display:grid;grid-template-columns:46px 1fr;gap:16px;margin-bottom:26px}
+  .step .b{width:46px;height:46px;border-radius:12px;background:var(--amb);color:#1a1206;font-family:Sora;font-weight:800;font-size:1.25rem;display:flex;align-items:center;justify-content:center}
+  .step h3{font-size:1.12rem;margin-bottom:.3em}
+  .step p{color:var(--mut);margin:.2em 0 .7em}
+  .ex{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:680px){.ex{grid-template-columns:1fr}}
+  .ex figure{margin:0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .ex figure img{width:100%;display:block}
+  .ex figcaption{padding:12px 14px;font-size:.88rem;color:var(--mut);background:var(--card)}
+  .phase{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+  .phase:last-child{border:none}
+  .phase .tag{flex:0 0 92px;font-family:Sora;font-weight:800;color:var(--amb)}
+  .phase .d strong{display:block;margin-bottom:.2em}
+  .phase .d span{color:var(--mut);font-size:.92rem}
+  footer{padding:46px 0;text-align:center;color:var(--mut);font-size:.9rem}
+  .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="brand" href="#top"><span class="emoji">🧭</span> Claude Session Kit</a>
+  <span class="sep">|</span>
+  <span class="clubpro">
+    <a class="inema" href="https://inema.club" target="_blank" rel="noopener">INEMA.CLUB</a>
+    <span class="sep">-</span>
+    <a class="pro" href="https://inema.pro" target="_blank" rel="noopener">PRO</a>
+  </span>
+  <div class="links">
+    <a class="sec" href="#oque">O que é</a>
+    <a class="sec" href="#fluxo">Como funciona</a>
+    <a class="sec" href="#guia">Guia de uso</a>
+    <a class="sec" href="#exemplos">Exemplos</a>
+    <a class="sec" href="#roadmap">Roadmap</a>
+    <button class="tgl" id="themeToggle" aria-label="Alternar tema" title="Alternar tema">🌙</button>
+    <a class="btn" href="https://github.com/inematds/claude-session-kit" target="_blank" rel="noopener">GitHub</a>
+  </div>
+</div></nav>
+
+<header class="hero" id="top">
+  <div class="glow"></div>
+  <div class="wrap">
+    <div>
+      <span class="chip">Claude Code · sessões enxutas</span>
+      <h1>Veja a <span class="amb">cota real</span> e nunca perca o fio no <code>/clear</code></h1>
+      <p class="lead">Statusline que mostra contexto, cota de 5 h, semanal geral e semanal por modelo. Três skills que fecham o ciclo: checkpoint, auditoria de memória e handoff.</p>
+      <div class="cta">
+        <a class="btn" href="#guia">Começar o guia</a>
+        <a class="btn ghost" href="https://github.com/inematds/claude-session-kit" target="_blank" rel="noopener">Ver no GitHub</a>
+      </div>
+    </div>
+    <figure><img src="assets/banner.jpg" alt="Banner do Claude Session Kit"></figure>
+  </div>
+</header>
+
+<section id="oque"><div class="wrap">
+  <span class="chip">O que é</span>
+  <h2>Três peças que se conversam</h2>
+  <p class="sub">O modelo não enxerga a própria cota. A barra enxerga. As skills usam o que a barra mostra pra decidir quando compactar, auditar ou entregar a sessão pro próximo agente.</p>
+  <div class="grid g3">
+    <div class="card"><h3>📊 Statusline com cota real</h3><p>Lê o endpoint oficial de uso e mostra <code>ctx</code>, <code>5h</code>, <code>w</code> (semanal geral) e <code>F</code> (semanal do modelo em uso, com <code>!</code> em alerta). Cache de 300 s pra não martelar a API.</p></div>
+    <div class="card"><h3>🧩 Skills de sessão</h3><p><code>session-statusline</code> (checkpoint), <code>memory-audit</code> (o que manter, comprimir, apagar) e <code>session-handoff</code> (resumo pro próximo agente). Todas chat-only, sem inventar estado.</p></div>
+    <div class="card"><h3>🗺️ Plano de otimização</h3><p>Gatilhos lidos direto da barra: ctx 40/60/80 %, cota de 5 h, cota por modelo. Regras de higiene e o que medir pra saber se está funcionando.</p></div>
+  </div>
+</div></section>
+
+<section id="fluxo"><div class="wrap">
+  <span class="chip">Como funciona</span>
+  <h2>O ciclo de uma sessão</h2>
+  <p class="sub">A barra sobe, você faz um checkpoint. Ficou ruidoso, audita e compacta. Vai limpar, entrega o handoff e cola na sessão nova.</p>
+  <div class="flow">
+    <span>trabalhar</span><span class="arr">→</span>
+    <span>ctx sobe</span><span class="arr">→</span>
+    <span>checkpoint</span><span class="arr">→</span>
+    <span>memory-audit</span><span class="arr">→</span>
+    <span>/compact</span><span class="arr">→</span>
+    <span>handoff</span><span class="arr">→</span>
+    <span>/clear</span>
+  </div>
+  <div class="grid g3" style="margin-top:28px">
+    <div class="card"><div class="num">1</div><h3>Checkpoint</h3><p>Foto rápida: foco atual, o que ficou guardado × candidato a memória, próximos passos e uma recomendação (continuar, compactar, auditar, handoff).</p></div>
+    <div class="card"><div class="num">2</div><h3>Auditoria de memória</h3><p>Inventário do contexto e do CLAUDE.md. Classifica cada item em manter, comprimir, mover ou apagar. Só grava se você pedir.</p></div>
+    <div class="card"><div class="num">3</div><h3>Handoff</h3><p>Resumo estruturado com caminhos absolutos, processos em background, comandos de verificação e um "pegue daqui". Sem retrospectiva.</p></div>
+  </div>
+</div></section>
+
+<section id="pre"><div class="wrap">
+  <span class="chip">Pré-requisitos</span>
+  <h2>O que precisa estar na máquina</h2>
+  <p class="sub">Tudo local. O script lê o token OAuth do próprio Claude Code e só fala com o endpoint oficial de uso.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Claude Code logado</h3><p>Login via claude.ai (OAuth). O token fica em <code>~/.claude/.credentials.json</code>.</p><pre><span class="k">claude</span> <span class="c"># e /login se ainda não estiver</span></pre></div>
+    <div class="card"><h3>jq + curl</h3><p>O script depende dos dois pra ler o payload e chamar a API.</p><pre><span class="k">sudo apt install</span> jq curl</pre></div>
+    <div class="card"><h3>O repo</h3><p>Clone e cole os prompts, ou copie os arquivos na mão.</p><pre><span class="k">git clone</span> <span class="s">https://github.com/inematds/claude-session-kit.git</span></pre></div>
+  </div>
+</div></section>
+
+<section id="guia"><div class="wrap">
+  <span class="chip">Guia de uso · passo a passo</span>
+  <h2>Do clone à barra funcionando</h2>
+  <p class="sub">Cada passo tem o comando real. Se preferir, os prompts do repo fazem isso por você dentro de uma sessão do Claude Code.</p>
+
+  <div class="step"><div class="b">1</div><div>
+    <h3>Instale o script da statusline</h3>
+    <p>Copie o script pra pasta do Claude Code e dê permissão de execução.</p>
+<pre><span class="k">cp</span> statusline/statusline-command.sh ~/.claude/statusline-command.sh
+<span class="k">chmod +x</span> ~/.claude/statusline-command.sh</pre>
+  </div></div>
+
+  <div class="step"><div class="b">2</div><div>
+    <h3>Aponte o settings.json pro script</h3>
+    <p>Mescle o bloco abaixo no seu <code>~/.claude/settings.json</code> (não apague as outras chaves). Ou cole <code>statusline/PROMPT.md</code> numa sessão e deixe o Claude fazer.</p>
+<pre>{
+  <span class="s">"statusLine"</span>: { <span class="s">"type"</span>: <span class="s">"command"</span>, <span class="s">"command"</span>: <span class="s">"bash ~/.claude/statusline-command.sh"</span> }
+}</pre>
+  </div></div>
+
+  <div class="step"><div class="b">3</div><div>
+    <h3>Teste a renderização</h3>
+    <p>Rode o script com um payload mínimo e confira a linha.</p>
+<pre><span class="k">echo</span> <span class="s">'{"cwd":"'$PWD'","model":{"display_name":"Fable 5.1"}}'</span> | <span class="k">bash</span> ~/.claude/statusline-command.sh
+<span class="c"># user@host:~/proj Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">4</div><div>
+    <h3>Leia a barra</h3>
+    <p>Cada campo tem um significado e um gatilho no plano.</p>
+<pre><span class="k">ctx 41%</span>          <span class="c"># % da janela de contexto usada nesta sessão</span>
+<span class="k">5h:2%→19:10</span>      <span class="c"># cota de 5 horas e a hora local do reset</span>
+<span class="k">w:69%</span>            <span class="c"># cota semanal de todos os modelos (weekly_all)</span>
+<span class="k">F:80%!</span>           <span class="c"># cota semanal do modelo em uso (weekly_scoped) — "!" = alerta</span>
+<span class="k">→14/09 21:00</span>     <span class="c"># quando a semanal reseta</span>
+<span class="k">d:40.9M</span>          <span class="c"># tokens do dia, contados nos JSONL locais</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">5</div><div>
+    <h3>Instale as três skills</h3>
+    <p>Copie as pastas pra <code>~/.claude/skills/</code>, ou cole <code>skills/PROMPT-instalar.md</code> numa sessão.</p>
+<pre><span class="k">cp -r</span> skills/session-statusline skills/memory-audit skills/session-handoff ~/.claude/skills/
+<span class="k">ls</span> ~/.claude/skills | <span class="k">grep</span> -E <span class="s">'session|memory'</span></pre>
+  </div></div>
+
+  <div class="step"><div class="b">6</div><div>
+    <h3>Use o ciclo</h3>
+    <p>Diga estas frases dentro da sessão. Cada uma dispara a skill certa.</p>
+<pre><span class="k">checkpoint</span>            <span class="c"># ou "onde estamos" → session-statusline</span>
+<span class="k">analise a memória</span>     <span class="c"># ou "memória inchada" → memory-audit</span>
+<span class="k">handoff</span>               <span class="c"># ou "vou dar /clear" → session-handoff, depois /clear e cole o resumo</span></pre>
+  </div></div>
+</div></section>
+
+<section id="exemplos"><div class="wrap">
+  <span class="chip">Exemplos</span>
+  <h2>Gatilhos lidos da barra</h2>
+  <p class="sub">Do <code>PLANO-OTIMIZACAO.md</code>. A barra é o sensor; a tabela é a regra.</p>
+  <div class="grid g2">
+    <div class="card"><h3>ctx 40–60 %</h3><p><strong>checkpoint</strong>. Decide se compacta agora ou segue.</p></div>
+    <div class="card"><h3>ctx &gt; 60 % ou saída repetitiva</h3><p><strong>memory-audit</strong> → aplicar o plano de enxugamento → <code>/compact</code>.</p></div>
+    <div class="card"><h3>ctx &gt; 80 %</h3><p><strong>handoff</strong> → <code>/clear</code> → colar o handoff na sessão nova.</p></div>
+    <div class="card"><h3>F: com "!"</h3><p>Trocar de modelo pra tarefas mecânicas (<code>/model</code>) ou esperar o reset indicado na barra.</p></div>
+  </div>
+</div></section>
+
+<section id="roadmap"><div class="wrap">
+  <span class="chip">Roadmap</span>
+  <h2>O que vem depois</h2>
+  <p class="sub">Pendências anotadas no plano.</p>
+  <div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por modelo na barra</strong><span>A API passou a mandar <code>weekly_scoped</code>; o script lê <code>.limits[]</code> e mostra <code>F:</code> ao lado de <code>w:</code>.</span></div></div>
+  <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Rodar a session-statusline automaticamente antes de todo <code>/compact</code>.</span></div></div>
+  <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Cores no ctx</strong><span>Verde, âmbar e vermelho nos cortes 40 / 60 / 80 %.</span></div></div>
+  <div class="phase"><div class="tag">ideia</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadear checkpoint → memory-audit → handoff numa chamada só.</span></div></div>
+</div></section>
+
+<footer>
+  <div class="wrap">
+    <div class="pill">bash</div><div class="pill">jq</div><div class="pill">Claude Code skills</div>
+    <p style="margin-top:18px">Claude Session Kit · projeto de pesquisa/educação ·
+      <a href="https://github.com/inematds/claude-session-kit">inematds/claude-session-kit</a> ·
+      <a href="https://inema.club">INEMA.CLUB</a></p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var KEY='claude-session-kit-theme';
+    var b=document.body, t=document.getElementById('themeToggle');
+    if(localStorage.getItem(KEY)==='light'){ b.classList.add('light'); t.textContent='☀️'; }
+    t.addEventListener('click',function(){
+      var light=b.classList.toggle('light');
+      t.textContent=light?'☀️':'🌙';
+      localStorage.setItem(KEY, light?'light':'dark');
+    });
+  })();
+</script>
+</body>
+</html>

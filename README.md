@@ -1,5 +1,11 @@
 # claude-session-kit
 
+[![Claude Session Kit](guia/assets/banner.jpg)](https://inematds.github.io/claude-session-kit/guia/)
+
+## 📖 Guia de uso
+
+Guia completo (landing + passo a passo): **https://inematds.github.io/claude-session-kit/guia/**
+
 Kit pra manter sessões do Claude Code enxutas: **statusline com cota real**
 (5 h, semanal geral e semanal por modelo) + **três skills de sessão** + **plano
 de otimização** que liga as duas coisas.
