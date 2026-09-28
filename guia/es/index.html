@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html lang="pt-BR">
+<html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>Claude Session Kit — statusline com cota real + skills de sessão</title>
-<meta content="Kit pra manter sessões do Claude Code enxutas: statusline com cota de 5h, semanal e por modelo, skills de checkpoint, auditoria de memória e handoff, e o plano que liga tudo." name="description"/>
+<title>Claude Session Kit — statusline con límite real + skills de sesión</title>
+<meta content="Kit para mantener ligeras las sesiones de Claude Code: statusline con cuota de 5 h, semanal y por modelo, skills de checkpoint, auditoría de memoria y handoff, y el plan que conecta todo." name="description"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;600&amp;display=swap" rel="stylesheet"/>
@@ -92,7 +92,7 @@
   .pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.3em .8em;font-size:.78rem;color:var(--mut);margin:0 4px}
 </style>
 <link href="https://inematds.github.io/claude-session-kit/guia/" hreflang="pt-BR" rel="alternate"/><link href="https://inematds.github.io/claude-session-kit/guia/en/" hreflang="en" rel="alternate"/><link href="https://inematds.github.io/claude-session-kit/guia/es/" hreflang="es" rel="alternate"/></head>
-<body><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="./" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">PT</a><a href="en/" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="es/" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">ES</a></div>
+<body><div class="inema-lang" style="position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:2px;padding:4px;border-radius:10px;background:rgba(12,12,16,.82);border:1px solid rgba(226,162,59,.45);font:600 12px/1 Sora,Inter,system-ui,sans-serif;backdrop-filter:blur(8px)" translate="no"><a href="../" hreflang="pt-BR" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">PT</a><a href="../en/" hreflang="en" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#e9e9ee">EN</a><a href="./" hreflang="es" style="padding:6px 8px;border-radius:7px;text-decoration:none;color:#1a1206;background:#E2A23B">ES</a></div>
 <nav><div class="wrap">
 <a class="brand" href="#top"><span class="emoji">🧭</span> Claude Session Kit</a>
 <span class="sep">|</span>
@@ -102,12 +102,12 @@
 <a class="pro" href="https://inema.pro" rel="noopener" target="_blank">PRO</a>
 </span>
 <div class="links">
-<a class="sec" href="#oque">O que é</a>
-<a class="sec" href="#fluxo">Como funciona</a>
-<a class="sec" href="#guia">Guia de uso</a>
-<a class="sec" href="#exemplos">Exemplos</a>
+<a class="sec" href="#oque">Qué es</a>
+<a class="sec" href="#fluxo">Cómo funciona</a>
+<a class="sec" href="#guia">Guía de uso</a>
+<a class="sec" href="#exemplos">Ejemplos</a>
 <a class="sec" href="#roadmap">Roadmap</a>
-<button aria-label="Alternar tema" class="tgl" id="themeToggle" title="Alternar tema">🌙</button>
+<button aria-label="Cambiar tema" class="tgl" id="themeToggle" title="Cambiar tema">🌙</button>
 <a class="btn" href="https://github.com/inematds/claude-session-kit" rel="noopener" target="_blank">GitHub</a>
 </div>
 </div></nav>
@@ -115,34 +115,34 @@
 <div class="glow"></div>
 <div class="wrap">
 <div>
-<span class="chip">Claude Code · sessões enxutas</span>
-<h1>Veja a <span class="amb">cota real</span> e nunca perca o fio no <code>/clear</code></h1>
-<p class="lead">Statusline que mostra contexto, cota de 5 h, semanal geral e semanal por modelo. Três skills que fecham o ciclo: checkpoint, auditoria de memória e handoff.</p>
+<span class="chip">Claude Code · sesiones concisas</span>
+<h1>Mira la <span class="amb">cuota real</span> y nunca pierdas el hilo en el <code>/clear</code></h1>
+<p class="lead">Statusline que muestra el contexto, la cuota de 5 h, la cuota semanal general y la semanal por modelo. Tres skills que completan el ciclo: checkpoint, auditoría de memoria y handoff.</p>
 <div class="cta">
-<a class="btn" href="#guia">Começar o guia</a>
-<a class="btn ghost" href="https://github.com/inematds/claude-session-kit" rel="noopener" target="_blank">Ver no GitHub</a>
+<a class="btn" href="#guia">Empezar la guía</a>
+<a class="btn ghost" href="https://github.com/inematds/claude-session-kit" rel="noopener" target="_blank">Ver en GitHub</a>
 </div>
 </div>
-<figure><img alt="Banner do Claude Session Kit" src="assets/banner.jpg"/></figure>
+<figure><img alt="Banner de Claude Session Kit" src="../assets/banner.jpg"/></figure>
 </div>
 </header>
 <section id="oque"><div class="wrap">
-<span class="chip">O que é</span>
-<h2>Três peças que se conversam</h2>
-<p class="sub">O modelo não enxerga a própria cota. A barra enxerga. As skills usam o que a barra mostra pra decidir quando compactar, auditar ou entregar a sessão pro próximo agente.</p>
+<span class="chip">Qué es</span>
+<h2>Tres piezas que se comunican</h2>
+<p class="sub">El modelo no puede ver su propia cuota. La barra sí. Las skills usan lo que muestra la barra para decidir cuándo compactar, auditar o entregar la sesión al siguiente agente.</p>
 <div class="grid g3">
-<div class="card"><h3>📊 Statusline com cota real</h3><p>Lê o endpoint oficial de uso e mostra <code>ctx</code>, <code>5h</code>, <code>w</code> (semanal geral) e <code>F</code> (semanal do modelo em uso, com <code>!</code> em alerta). Cache de 300 s pra não martelar a API.</p></div>
-<div class="card"><h3>🧩 Skills de sessão</h3><p><code>session-statusline</code> (checkpoint), <code>memory-audit</code> (o que manter, comprimir, apagar) e <code>session-handoff</code> (resumo pro próximo agente). De apoio: <code>maestro-roteador</code> (modelo e esforço) e <code>fable-mindset</code> (playbook a partir dos logs).</p></div>
-<div class="card"><h3>🗺️ Plano de otimização</h3><p>Gatilhos lidos direto da barra: ctx 40/60/80 %, cota de 5 h, cota por modelo. Regras de higiene e o que medir pra saber se está funcionando.</p></div>
+<div class="card"><h3>📊 Statusline con cuota real</h3><p>Lee el endpoint oficial de uso y muestra <code>ctx</code>, <code>5h</code>, <code>w</code> (semanal general) y <code>F</code> (semanal del modelo en uso, con <code>!</code> en alerta). Caché de 300 s para no martillar la API.</p></div>
+<div class="card"><h3>🧩 Skills de sesión</h3><p><code>session-statusline</code> (checkpoint), <code>memory-audit</code> (qué conservar, comprimir, borrar) y <code>session-handoff</code> (resumen para el próximo agente). Como apoyo: <code>maestro-roteador</code> (modelo y esfuerzo) y <code>fable-mindset</code> (playbook a partir de los registros).</p></div>
+<div class="card"><h3>🗺️ Plan de optimización</h3><p>Activadores leídos directamente de la barra: contexto 40/60/80 %, cuota de 5 h, cuota por modelo. Reglas de higiene y qué medir para saber si está funcionando.</p></div>
 </div>
 </div></section>
 <section id="fluxo"><div class="wrap">
-<span class="chip">Como funciona</span>
-<h2>O ciclo de uma sessão</h2>
-<p class="sub">A barra sobe, você faz um checkpoint. Ficou ruidoso, audita e compacta. Vai limpar, entrega o handoff e cola na sessão nova.</p>
+<span class="chip">Cómo funciona</span>
+<h2>El ciclo de una sesión</h2>
+<p class="sub">La barra sube y haces un checkpoint. Si hay mucho ruido, audita y compacta. Si vas a limpiar, entrega el handoff y pégalo en la nueva sesión.</p>
 <div class="flow">
-<span>trabalhar</span><span class="arr">→</span>
-<span>ctx sobe</span><span class="arr">→</span>
+<span>trabajar</span><span class="arr">→</span>
+<span>ctx sube</span><span class="arr">→</span>
 <span>checkpoint</span><span class="arr">→</span>
 <span>memory-audit</span><span class="arr">→</span>
 <span>/compact</span><span class="arr">→</span>
@@ -150,96 +150,96 @@
 <span>/clear</span>
 </div>
 <div class="grid g3" style="margin-top:28px">
-<div class="card"><div class="num">1</div><h3>Checkpoint</h3><p>Foto rápida: foco atual, o que ficou guardado × candidato a memória, próximos passos e uma recomendação (continuar, compactar, auditar, handoff).</p></div>
-<div class="card"><div class="num">2</div><h3>Auditoria de memória</h3><p>Inventário do contexto e do CLAUDE.md. Classifica cada item em manter, comprimir, mover ou apagar. Só grava se você pedir.</p></div>
-<div class="card"><div class="num">3</div><h3>Handoff</h3><p>Resumo estruturado com caminhos absolutos, processos em background, comandos de verificação e um "pegue daqui". Sem retrospectiva.</p></div>
+<div class="card"><div class="num">1</div><h3>Checkpoint</h3><p>Vista rápida: foco actual, qué quedó guardado × candidato a memoria, próximos pasos y una recomendación (continuar, compactar, auditar, handoff).</p></div>
+<div class="card"><div class="num">2</div><h3>Auditoría de memoria</h3><p>Inventario del contexto y del CLAUDE.md. Clasifica cada elemento como conservar, comprimir, mover o borrar. Solo lo guarda si lo pides.</p></div>
+<div class="card"><div class="num">3</div><h3>Handoff</h3><p>Resumen estructurado con rutas absolutas, procesos en segundo plano, comandos de verificación y un "retoma desde aquí". Sin retrospectiva.</p></div>
 </div>
 </div></section>
 <section id="pre"><div class="wrap">
-<span class="chip">Pré-requisitos</span>
-<h2>O que precisa estar na máquina</h2>
-<p class="sub">Tudo local. O script lê o token OAuth do próprio Claude Code e só fala com o endpoint oficial de uso.</p>
+<span class="chip">Requisitos previos</span>
+<h2>Lo que debe estar en la máquina</h2>
+<p class="sub">Todo local. El script lee el token OAuth del propio Claude Code y solo se comunica con el endpoint oficial de uso.</p>
 <div class="grid g3">
-<div class="card"><h3>Claude Code logado</h3><p>Login via claude.ai (OAuth). O token fica em <code>~/.claude/.credentials.json</code>.</p><pre><span class="k">claude</span> <span class="c"># e /login se ainda não estiver</span></pre></div>
-<div class="card"><h3>jq + curl</h3><p>O script depende dos dois pra ler o payload e chamar a API.</p><pre><span class="k">sudo apt install</span> jq curl</pre></div>
-<div class="card"><h3>O repo</h3><p>Clone e cole os prompts, ou copie os arquivos na mão.</p><pre><span class="k">git clone</span> <span class="s">https://github.com/inematds/claude-session-kit.git</span></pre></div>
+<div class="card"><h3>Claude Code con sesión iniciada</h3><p>Inicio de sesión mediante claude.ai (OAuth). El token queda en <code>~/.claude/.credentials.json</code>.</p><pre><span class="k">claude</span> <span class="c"># y /login si aún no lo hiciste</span></pre></div>
+<div class="card"><h3>jq + curl</h3><p>El script depende de ambos para leer el payload y llamar a la API.</p><pre><span class="k">sudo apt install</span> jq curl</pre></div>
+<div class="card"><h3>El repo</h3><p>Clona y pega los prompts, o copia los archivos manualmente.</p><pre><span class="k">git clone</span> <span class="s">https://github.com/inematds/claude-session-kit.git</span></pre></div>
 </div>
 </div></section>
 <section id="guia"><div class="wrap">
-<span class="chip">Guia de uso · passo a passo</span>
-<h2>Do clone à barra funcionando</h2>
-<p class="sub">Cada passo tem o comando real. Se preferir, os prompts do repo fazem isso por você dentro de uma sessão do Claude Code.</p>
+<span class="chip">Guía de uso · paso a paso</span>
+<h2>Del clon a la barra funcionando</h2>
+<p class="sub">Cada paso tiene el comando real. Si lo prefieres, los prompts del repo lo hacen por ti dentro de una sesión de Claude Code.</p>
 <div class="step"><div class="b">1</div><div>
-<h3>Instale o script da statusline</h3>
-<p>Copie o script pra pasta do Claude Code e dê permissão de execução.</p>
+<h3>Instala el script de la statusline</h3>
+<p>Copia el script a la carpeta de Claude Code y dale permiso de ejecución.</p>
 <pre><span class="k">cp</span> statusline/statusline-command.sh ~/.claude/statusline-command.sh
 <span class="k">chmod +x</span> ~/.claude/statusline-command.sh</pre>
 </div></div>
 <div class="step"><div class="b">2</div><div>
-<h3>Aponte o settings.json pro script</h3>
-<p>Mescle o bloco abaixo no seu <code>~/.claude/settings.json</code> (não apague as outras chaves). Ou cole <code>statusline/PROMPT.md</code> numa sessão e deixe o Claude fazer.</p>
+<h3>Apunta settings.json al script</h3>
+<p>Combina el bloque de abajo con tu <code>~/.claude/settings.json</code> (no borres las otras claves). O pega <code>statusline/PROMPT.md</code> en una sesión y deja que Claude lo haga.</p>
 <pre>{
   <span class="s">"statusLine"</span>: { <span class="s">"type"</span>: <span class="s">"command"</span>, <span class="s">"command"</span>: <span class="s">"bash ~/.claude/statusline-command.sh"</span> }
 }</pre>
 </div></div>
 <div class="step"><div class="b">3</div><div>
-<h3>Teste a renderização</h3>
-<p>Rode o script com um payload mínimo e confira a linha.</p>
+<h3>Prueba la renderización</h3>
+<p>Ejecuta el script con un payload mínimo y verifica la línea.</p>
 <pre><span class="k">echo</span> <span class="s">'{"cwd":"'$PWD'","model":{"display_name":"Fable 5.1"}}'</span> | <span class="k">bash</span> ~/.claude/statusline-command.sh
 <span class="c"># user@host:~/proj Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M</span></pre>
 </div></div>
 <div class="step"><div class="b">4</div><div>
-<h3>Leia a barra</h3>
-<p>Cada campo tem um significado e um gatilho no plano.</p>
-<pre><span class="k">ctx 41%</span>          <span class="c"># % da janela de contexto usada nesta sessão</span>
-<span class="k">5h:2%→19:10</span>      <span class="c"># cota de 5 horas e a hora local do reset</span>
-<span class="k">w:69%</span>            <span class="c"># cota semanal de todos os modelos (weekly_all)</span>
-<span class="k">F:80%!</span>           <span class="c"># cota semanal do modelo em uso (weekly_scoped) — "!" = alerta</span>
-<span class="k">→14/09 21:00</span>     <span class="c"># quando a semanal reseta</span>
-<span class="k">d:40.9M</span>          <span class="c"># tokens do dia, contados nos JSONL locais</span></pre>
+<h3>Lee la barra</h3>
+<p>Cada campo tiene un significado y un desencadenante en el plan.</p>
+<pre><span class="k">ctx 41%</span>          <span class="c"># % de la ventana de contexto usada en esta sesión</span>
+<span class="k">5h:2%→19:10</span>      <span class="c"># límite de 5 horas y hora local del reinicio</span>
+<span class="k">w:69%</span>            <span class="c"># límite semanal de todos los modelos (weekly_all)</span>
+<span class="k">F:80%!</span>           <span class="c"># límite semanal del modelo en uso (weekly_scoped) — "!" = alerta</span>
+<span class="k">→14/09 21:00</span>     <span class="c"># cuando se reinicia el límite semanal</span>
+<span class="k">d:40.9M</span>          <span class="c"># tokens del día, contados en los JSONL locales</span></pre>
 </div></div>
 <div class="step"><div class="b">5</div><div>
-<h3>Instale as skills</h3>
-<p>Copie as pastas pra <code>~/.claude/skills/</code>, ou cole <code>skills/PROMPT-instalar.md</code> numa sessão.</p>
+<h3>Instala las skills</h3>
+<p>Copia las carpetas a <code>~/.claude/skills/</code>, o pega <code>skills/PROMPT-instalar.md</code> en una sesión.</p>
 <pre><span class="k">cp -r</span> skills/session-statusline skills/memory-audit skills/session-handoff ~/.claude/skills/
-<span class="k">cp -r</span> skills/maestro-roteador skills/fable-mindset ~/.claude/skills/   <span class="c"># apoio: modelo/esforço e playbook</span>
+<span class="k">cp -r</span> skills/maestro-roteador skills/fable-mindset ~/.claude/skills/   <span class="c"># apoyo: modelo/esfuerzo y playbook</span>
 <span class="k">ls</span> ~/.claude/skills | <span class="k">grep</span> -E <span class="s">'session|memory|maestro|fable'</span></pre>
 </div></div>
 <div class="step"><div class="b">6</div><div>
-<h3>Use o ciclo</h3>
-<p>Diga estas frases dentro da sessão. Cada uma dispara a skill certa.</p>
-<pre><span class="k">checkpoint</span>            <span class="c"># ou "onde estamos" → session-statusline</span>
-<span class="k">analise a memória</span>     <span class="c"># ou "memória inchada" → memory-audit</span>
-<span class="k">handoff</span>               <span class="c"># ou "vou dar /clear" → session-handoff, depois /clear e cole o resumo</span>
-<span class="k">qual modelo uso?</span>      <span class="c"># quando F: está com "!" → maestro-roteador</span>
-<span class="k">analisar minhas sessões</span> <span class="c"># playbook por modelo a partir dos JSONL → fable-mindset</span></pre>
+<h3>Usa el ciclo</h3>
+<p>Di estas frases durante la sesión. Cada una activa la skill correcta.</p>
+<pre><span class="k">checkpoint</span>            <span class="c"># o "dónde estamos" → session-statusline</span>
+<span class="k">analise a memória</span>     <span class="c"># o "memoria inflada" → memory-audit</span>
+<span class="k">handoff</span>               <span class="c"># o "voy a ejecutar /clear" → session-handoff, luego /clear y pega el resumen</span>
+<span class="k">qual modelo uso?</span>      <span class="c"># cuando F: está con "!" → maestro-roteador</span>
+<span class="k">analisar minhas sessões</span> <span class="c"># playbook por modelo a partir de los JSONL → fable-mindset</span></pre>
 </div></div>
 </div></section>
 <section id="exemplos"><div class="wrap">
-<span class="chip">Exemplos</span>
-<h2>Gatilhos lidos da barra</h2>
-<p class="sub">Do <code>PLANO-OTIMIZACAO.md</code>. A barra é o sensor; a tabela é a regra.</p>
+<span class="chip">Ejemplos</span>
+<h2>Activadores leídos de la barra</h2>
+<p class="sub">De <code>PLANO-OTIMIZACAO.md</code>. La barra es el sensor; la tabla es la regla.</p>
 <div class="grid g2">
-<div class="card"><h3>ctx 40–60 %</h3><p><strong>checkpoint</strong>. Decide se compacta agora ou segue.</p></div>
-<div class="card"><h3>ctx &gt; 60 % ou saída repetitiva</h3><p><strong>memory-audit</strong> → aplicar o plano de enxugamento → <code>/compact</code>.</p></div>
-<div class="card"><h3>ctx &gt; 80 %</h3><p><strong>handoff</strong> → <code>/clear</code> → colar o handoff na sessão nova.</p></div>
-<div class="card"><h3>F: com "!"</h3><p><code>maestro-roteador</code> decide o que vai pra modelo mais barato (<code>/model</code> ou subagente). O resto espera o reset indicado na barra.</p></div>
+<div class="card"><h3>ctx 40–60 %</h3><p><strong>checkpoint</strong>. Decide si compactas ahora o sigues.</p></div>
+<div class="card"><h3>ctx &gt; 60 % o salida repetitiva</h3><p><strong>memory-audit</strong> → aplicar el plan de optimización → <code>/compact</code>.</p></div>
+<div class="card"><h3>ctx &gt; 80 %</h3><p><strong>handoff</strong> → <code>/clear</code> → pegar el handoff en la sesión nueva.</p></div>
+<div class="card"><h3>F: con "!"</h3><p><code>maestro-roteador</code> decide qué va a un modelo más barato (<code>/model</code> o subagente). El resto espera el reinicio indicado en la barra.</p></div>
 </div>
-<p class="sub" style="margin-top:28px">A teoria por trás do kit é o curso <a href="https://inematds.github.io/cctop/" rel="noopener" target="_blank">Mestre em Contexto e Tokens</a>: releitura de contexto, prompt caching, rotina de <code>/clear</code> e <code>/compact</code>, handoff e subagentes. Plugins compatíveis com o ciclo (não incluídos): context-mode, claude-mem, claudex.</p>
+<p class="sub" style="margin-top:28px">La teoría detrás del kit está en el curso <a href="https://inematds.github.io/cctop/" rel="noopener" target="_blank">Maestro en Contexto y Tokens</a>: releer el contexto, prompt caching, rutina de <code>/clear</code> e <code>/compact</code>, handoff y subagentes. Plugins compatibles con el ciclo (no incluidos): context-mode, claude-mem, claudex.</p>
 </div></section>
 <section id="roadmap"><div class="wrap">
 <span class="chip">Roadmap</span>
-<h2>O que vem depois</h2>
-<p class="sub">Pendências anotadas no plano.</p>
-<div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por modelo na barra</strong><span>A API passou a mandar <code>weekly_scoped</code>; o script lê <code>.limits[]</code> e mostra <code>F:</code> ao lado de <code>w:</code>.</span></div></div>
-<div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Rodar a session-statusline automaticamente antes de todo <code>/compact</code>.</span></div></div>
-<div class="phase"><div class="tag">próximo</div><div class="d"><strong>Cores no ctx</strong><span>Verde, âmbar e vermelho nos cortes 40 / 60 / 80 %.</span></div></div>
-<div class="phase"><div class="tag">ideia</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadear checkpoint → memory-audit → handoff numa chamada só.</span></div></div>
+<h2>Lo que sigue</h2>
+<p class="sub">Pendientes anotados en el plan.</p>
+<div class="phase"><div class="tag">hecho</div><div class="d"><strong>Cuota por modelo en la barra</strong><span>La API empezó a enviar <code>weekly_scoped</code>; el script lee <code>.limits[]</code> y muestra <code>F:</code> al lado de <code>w:</code>.</span></div></div>
+<div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Ejecutar automáticamente session-statusline antes de cada <code>/compact</code>.</span></div></div>
+<div class="phase"><div class="tag">próximo</div><div class="d"><strong>Colores en el contexto</strong><span>Verde, ámbar y rojo en los cortes de 40 / 60 / 80 %.</span></div></div>
+<div class="phase"><div class="tag">idea</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadenar checkpoint → memory-audit → handoff en una sola llamada.</span></div></div>
 </div></section>
 <footer>
 <div class="wrap">
-<div class="pill">bash</div><div class="pill">jq</div><div class="pill">Claude Code skills</div>
-<p style="margin-top:18px">Claude Session Kit · projeto de pesquisa/educação ·
+<div class="pill">bash</div><div class="pill">jq</div><div class="pill">Skills de Claude Code</div>
+<p style="margin-top:18px">Claude Session Kit · proyecto de investigación/educación ·
       <a href="https://github.com/inematds/claude-session-kit">inematds/claude-session-kit</a> ·
       <a href="https://inema.club">INEMA.CLUB</a></p>
 </div>

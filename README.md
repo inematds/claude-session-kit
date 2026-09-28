@@ -1,5 +1,7 @@
 # claude-session-kit
 
+**🇧🇷 [Português](README.md) · 🇺🇸 [English](README.en.md) · 🇪🇸 [Español](README.es.md)**
+
 [![Claude Session Kit](guia/assets/banner.jpg)](https://inematds.github.io/claude-session-kit/guia/)
 
 ## 📖 Guia de uso
