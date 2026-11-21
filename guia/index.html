@@ -216,6 +216,13 @@
 <span class="k">qual modelo uso?</span>      <span class="c"># quando F: está com "!" → maestro-roteador</span>
 <span class="k">analisar minhas sessões</span> <span class="c"># playbook por modelo a partir dos JSONL → fable-mindset</span></pre>
 </div></div>
+<div class="step"><div class="b">7</div><div>
+<h3>Painel das sessões (opcional)</h3>
+<p>Ligue o retrato na statusline e abra um painel no visual Jarvis com todas as sessões: contexto, modelo, custo, projeto ativo e a cota da conta. Roda só no seu computador (127.0.0.1), só lê e não precisa de nada além do Python 3.</p>
+<pre><span class="k">export</span> STATUSLINE_RETRATO=1          <span class="c"># no ~/.bashrc: a barra passa a gravar um retrato por sessão</span>
+<span class="k">python3</span> painel/painel.py            <span class="c"># abre em http://127.0.0.1:8781</span></pre>
+<p>Sem servidor, a página mostra dados de exemplo: <a href="../painel/">veja o painel em modo exemplo</a>.</p>
+</div></div>
 </div></section>
 <section id="exemplos"><div class="wrap">
 <span class="chip">Exemplos</span>
@@ -235,6 +242,7 @@
 <p class="sub">Pendências anotadas no plano.</p>
 <div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por modelo na barra</strong><span>A API passou a mandar <code>weekly_scoped</code>; o script lê <code>.limits[]</code> e mostra <code>F:</code> ao lado de <code>w:</code>.</span></div></div>
 <div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por conta e projeto ativo</strong><span>Com <code>CLAUDE_CONFIG_DIR</code>, cada login tem seu próprio token e cache de cota. <code>→ X</code> mostra o projeto para onde o trabalho foi; <code>cc:</code>/<code>cx:</code> mostram as contas do Claude e do Codex (desligue com <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
+<div class="phase"><div class="tag">feito</div><div class="d"><strong>Painel das sessões</strong><span><code>STATUSLINE_RETRATO=1</code> grava um retrato por sessão; <code>painel/painel.py</code> mostra todas num lugar, no visual Jarvis.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Rodar a session-statusline automaticamente antes de todo <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Cores no ctx</strong><span>Verde, âmbar e vermelho nos cortes 40 / 60 / 80 %.</span></div></div>
 <div class="phase"><div class="tag">ideia</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadear checkpoint → memory-audit → handoff numa chamada só.</span></div></div>

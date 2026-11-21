@@ -24,6 +24,9 @@ skills/
   session-handoff/        resumen estructurado antes de /clear
   maestro-roteador/       elige modelo y esfuerzo antes de despachar (cuando la cuota se reduce)
   fable-mindset/          procesa los JSONL de las sesiones y genera un playbook por modelo
+painel/
+  painel.py               servidor local (127.0.0.1:8781), solo lectura
+  index.html              la pantalla con estilo Jarvis (sin servidor, muestra datos de ejemplo)
 PLANO-OTIMIZACAO.md       el ciclo checkpoint → audit → handoff y los disparadores
 ```
 
@@ -41,6 +44,20 @@ que "no se actualizaba".
 Instalación: pega `statusline/PROMPT.md` en una sesión de Claude Code, o hazlo
 manualmente: copia el script a `~/.claude/statusline-command.sh` y agrega el bloque de
 `settings-snippet.json` a `~/.claude/settings.json`.
+
+### Cuentas y proyecto activo
+
+`→ X` muestra el proyecto al que se dirigió el trabajo (carpeta raíz en `STATUSLINE_PROJETOS`, predeterminada `~/projetos`); `cc:`/`cx:` muestran las cuentas de Claude y Codex (desactiva con `STATUSLINE_CONTAS=0`). Con `CLAUDE_CONFIG_DIR`, cada inicio de sesión tiene su propia caché de cuota.
+
+## Panel (opcional)
+
+Con `STATUSLINE_RETRATO=1`, la statusline guarda un JSON pequeño por sesión en `~/.local/share/claude-session-kit/sessoes/` (sin token). `python3 painel/painel.py` abre en http://127.0.0.1:8781 una pantalla con todas las sesiones (contexto, modelo, costo, proyecto activo, cuentas) y la cuota de la cuenta, con alertas cuando el contexto supera el 60 % o la cuota supera el 80 %. Solo lee; no se ejecuta nada. Demostración con datos de ejemplo:
+https://inematds.github.io/claude-session-kit/painel/
+
+```bash
+export STATUSLINE_RETRATO=1
+python3 painel/painel.py
+```
 
 ## Skills
 

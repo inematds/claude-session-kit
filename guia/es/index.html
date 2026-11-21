@@ -216,6 +216,13 @@
 <span class="k">qual modelo uso?</span>      <span class="c"># cuando F: está con "!" → maestro-roteador</span>
 <span class="k">analisar minhas sessões</span> <span class="c"># playbook por modelo a partir de los JSONL → fable-mindset</span></pre>
 </div></div>
+<div class="step"><div class="b">7</div><div>
+<h3>Panel de sesiones (opcional)</h3>
+<p>Activa el registro en la statusline y abre un panel con estilo Jarvis que muestra todas las sesiones: contexto, modelo, costo, proyecto activo y la cuota de la cuenta. Se ejecuta solo en tu computadora (127.0.0.1), solo lee y no necesita nada aparte de Python 3.</p>
+<pre><span class="k">export</span> STATUSLINE_RETRATO=1          <span class="c"># en ~/.bashrc: la barra empieza a guardar un registro por sesión</span>
+<span class="k">python3</span> painel/painel.py            <span class="c"># abre en http://127.0.0.1:8781</span></pre>
+<p>Sin servidor, la página muestra datos de ejemplo: <a href="../../painel/">ver el panel en modo de ejemplo</a>.</p>
+</div></div>
 </div></section>
 <section id="exemplos"><div class="wrap">
 <span class="chip">Ejemplos</span>
@@ -235,6 +242,7 @@
 <p class="sub">Pendientes anotados en el plan.</p>
 <div class="phase"><div class="tag">hecho</div><div class="d"><strong>Cuota por modelo en la barra</strong><span>La API empezó a enviar <code>weekly_scoped</code>; el script lee <code>.limits[]</code> y muestra <code>F:</code> al lado de <code>w:</code>.</span></div></div>
 <div class="phase"><div class="tag">hecho</div><div class="d"><strong>Cuota por cuenta y proyecto activo</strong><span>Con <code>CLAUDE_CONFIG_DIR</code>, cada inicio de sesión tiene su propio token y caché de cuota. <code>→ X</code> muestra el proyecto al que se trasladó el trabajo; <code>cc:</code>/<code>cx:</code> muestran las cuentas de Claude y Codex (desactívalo con <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
+<div class="phase"><div class="tag">hecho</div><div class="d"><strong>Panel de sesiones</strong><span><code>STATUSLINE_RETRATO=1</code> guarda un registro por sesión; <code>painel/painel.py</code> las muestra todas en un solo lugar, con estilo Jarvis.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Ejecutar automáticamente session-statusline antes de cada <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Colores en el contexto</strong><span>Verde, ámbar y rojo en los cortes de 40 / 60 / 80 %.</span></div></div>
 <div class="phase"><div class="tag">idea</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadenar checkpoint → memory-audit → handoff en una sola llamada.</span></div></div>

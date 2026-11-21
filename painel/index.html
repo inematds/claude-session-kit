@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JARVIS — sessões</title>
+<meta name="description" content="Painel das suas sessões do Claude Code: contexto, cota, modelo e projeto de cada uma, num lugar só. Só lê.">
+<style>
+:root{
+  --bg:#040a17; --painel:rgba(10,28,58,.62); --linha:rgba(95,227,255,.22);
+  --ciano:#5fe3ff; --ciano2:#2bb8e6; --gelo:#e8f7ff; --mut:#8fb2c9; --alerta:#ffb020; --erro:#ff5d6c;
+  --mono:ui-monospace,"JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,Inter,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:radial-gradient(ellipse at 50% 40%,#0b2148 0%,var(--bg) 62%) fixed,var(--bg);color:var(--gelo);
+  font:15px/1.45 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(95,227,255,.035) 0 1px,transparent 1px 3px);z-index:0}
+.app{position:relative;z-index:1;display:grid;grid-template-rows:auto 1fr auto;min-height:100vh;max-width:1600px;margin:0 auto;padding:14px 18px 16px;gap:14px}
+header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px solid var(--linha);padding-bottom:10px}
+.marca{font:700 13px var(--mono);letter-spacing:.32em;color:var(--ciano)}
+.relogio{margin-left:auto;font:600 22px var(--mono);letter-spacing:.06em}
+.data{font:12px var(--mono);color:var(--mut);letter-spacing:.12em;text-transform:uppercase}
+.selo{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--linha);color:var(--ciano);
+  background:transparent;border-radius:999px;padding:6px 12px;cursor:pointer;min-height:32px}
+.selo.desl{color:var(--mut)}
+.exemplo{font:600 11px var(--mono);color:var(--alerta);border:1px solid var(--alerta);border-radius:4px;padding:1px 6px}
+button:focus-visible{outline:2px solid var(--ciano);outline-offset:2px}
+main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr) minmax(0,.9fr);gap:16px;align-items:stretch;min-height:0}
+.painel{background:var(--painel);border:1px solid var(--linha);border-radius:14px;padding:14px 14px 10px;display:flex;flex-direction:column;
+  min-height:0;max-height:calc(100vh - 220px);transition:opacity .5s;position:relative}
+.painel::after{content:"";position:absolute;top:-1px;left:16px;width:56px;height:2px;background:var(--ciano);box-shadow:0 0 12px var(--ciano)}
+.painel h2{margin:0 0 4px;font:700 12px var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--ciano)}
+.painel .sub{margin:0 0 10px;font-size:12px;color:var(--mut)}
+.lista{list-style:none;margin:0;padding:0 4px 0 0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--ciano2) transparent}
+.lista li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:3px 10px;align-items:start;padding:9px 2px;border-bottom:1px solid rgba(95,227,255,.09)}
+.ponto{width:9px;height:9px;border-radius:50%;margin-top:6px;background:var(--ciano);box-shadow:0 0 8px var(--ciano)}
+.ponto.parada{background:transparent;border:1px solid var(--mut);box-shadow:none}
+.ponto.quente{background:var(--alerta);box-shadow:0 0 10px var(--alerta);animation:pisca 1.2s infinite}
+@keyframes pisca{50%{opacity:.35}}
+.nome{font:600 13px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nome .seta{color:#ffd84d}
+.rot{font:600 12px var(--mono);color:var(--mut);white-space:nowrap;text-align:right}
+.det{grid-column:2/4;font:12px var(--mono);color:var(--mut);display:flex;gap:4px 12px;flex-wrap:wrap}
+.det b{color:var(--gelo);font-weight:600}
+.barrinha{grid-column:2/4;height:4px;border-radius:2px;background:rgba(95,227,255,.12);overflow:hidden}
+.barrinha i{display:block;height:100%;background:var(--ciano)}
+.barrinha i.al{background:var(--alerta)} .barrinha i.cr{background:var(--erro)}
+.vazio{font-size:14px;color:var(--mut);padding:10px 2px}
+.vazio code{font:12px var(--mono);color:var(--gelo);background:rgba(95,227,255,.08);padding:1px 5px;border-radius:4px}
+/* núcleo */
+.nucleo{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px}
+#cv{width:100%;max-width:500px;aspect-ratio:1/1;display:block}
+.centro{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;text-align:center}
+.centro .nomeia{font:800 clamp(20px,2.4vw,32px) var(--mono);letter-spacing:.34em;margin-right:-.34em;text-shadow:0 0 18px var(--ciano)}
+.centro .status{margin-top:8px;font:12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ciano);max-width:52%}
+.numeros{display:flex;gap:18px;justify-content:center;flex-wrap:wrap;margin-top:4px;font:12px var(--mono);color:var(--mut)}
+.numeros b{color:var(--gelo);font-size:16px;display:block;text-align:center}
+.numeros .al b{color:var(--alerta)}
+/* cotas */
+.cota{margin:4px 0 12px}
+.cota .lin{display:flex;justify-content:space-between;font:12px var(--mono);color:var(--mut);margin-bottom:4px}
+.cota .lin b{color:var(--gelo)}
+.cota .trilho{height:8px;border-radius:4px;background:rgba(95,227,255,.12);overflow:hidden}
+.cota .trilho i{display:block;height:100%;background:linear-gradient(90deg,var(--ciano2),var(--ciano))}
+.cota .trilho i.al{background:var(--alerta)} .cota .trilho i.cr{background:var(--erro)}
+.alertas li{grid-template-columns:12px minmax(0,1fr)}
+.alertas .txt{font-size:13px;overflow-wrap:anywhere}
+/* barra de comando */
+footer{display:grid;gap:10px}
+.resposta{min-height:2.2em;font:14px/1.5 var(--mono);border-left:2px solid var(--ciano);padding:4px 0 4px 12px;overflow-wrap:anywhere}
+.barra{display:flex;gap:10px;flex-wrap:wrap;align-items:center;border:1px solid var(--linha);border-radius:12px;padding:8px;background:rgba(6,18,40,.7)}
+.barra .pr{font:700 12px var(--mono);color:var(--ciano);padding:0 6px;letter-spacing:.2em}
+.barra button{flex:1 1 140px;font:600 13px var(--sans);color:var(--gelo);background:rgba(95,227,255,.07);border:1px solid var(--linha);
+  border-radius:10px;padding:11px 12px;cursor:pointer;min-height:44px}
+.barra button:hover,.barra button.on{border-color:var(--ciano);background:rgba(95,227,255,.16)}
+.barra kbd{font:11px var(--mono);color:var(--mut);margin-left:6px}
+body.foco .painel{opacity:.15}
+@media (max-width:1000px){
+  main{grid-template-columns:1fr}
+  .nucleo{order:-1;min-height:0}
+  #cv{max-width:300px}
+  .painel{max-height:none}
+  .relogio{margin-left:0}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <span class="marca">JARVIS · SESSÕES</span>
+    <span class="exemplo" id="selExemplo" hidden>EXEMPLO</span>
+    <span class="data" id="data"></span>
+    <span class="relogio" id="relogio">--:--</span>
+    <button class="selo desl" id="voz" aria-pressed="false">Voz: desligada</button>
+  </header>
+
+  <main>
+    <section class="painel" aria-labelledby="hSes">
+      <h2 id="hSes">Sessões</h2>
+      <p class="sub" id="subSes">Cada terminal do Claude Code, do mais recente para o mais antigo.</p>
+      <ul class="lista" id="sessoes"></ul>
+    </section>
+
+    <section class="nucleo" aria-label="Núcleo">
+      <canvas id="cv" width="1000" height="1000" aria-hidden="true"></canvas>
+      <div class="centro">
+        <div class="nomeia">JARVIS</div>
+        <div class="status" id="status">lendo…</div>
+      </div>
+      <div class="numeros" id="numeros"></div>
+    </section>
+
+    <section class="painel" aria-labelledby="hCota">
+      <h2 id="hCota">Cota da conta</h2>
+      <p class="sub">Da sessão que atualizou por último.</p>
+      <div id="cotas"></div>
+      <h2 style="margin-top:6px">Atenção</h2>
+      <ul class="lista alertas" id="alertas"></ul>
+    </section>
+  </main>
+
+  <footer>
+    <div class="resposta" id="resposta" aria-live="polite"></div>
+    <div class="barra" role="toolbar" aria-label="Comandos">
+      <span class="pr">&gt;_</span>
+      <button id="bStatus">Status<kbd>1</kbd></button>
+      <button id="bAtivas" aria-pressed="false">Só ativas<kbd>2</kbd></button>
+      <button id="bFoco" aria-pressed="false">Modo foco<kbd>3</kbd></button>
+    </div>
+  </footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = id => document.getElementById(id);
+const REDUZ = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let dados = null, soAtivas = false, voz = false, exemplo = false;
+
+/* ---------- exemplo (GitHub Pages ou sem servidor) ---------- */
+function exemplos() {
+  const s = (nome, proj, ativo, modelo, esf, ctx, custo, est, idade) =>
+    ({ session_id: "exemplo", nome, projeto: proj, cwd: "~/projetos/" + proj, ativo, contas: "cc:voce cx:voce",
+       modelo, esforco: esf, ctx_pct: ctx, custo_usd: custo, estado: est, idade_s: idade, linhas_mais: 120, linhas_menos: 18 });
+  return {
+    resumo: { ativas: 3, paradas: 1, custo_usd: 7.9, tokens_dia: 41.2e6, cota_5h: 34, cota_5h_reset: "19:10",
+              cota_semana: 61, cota_semana_reset: "26/11 11:00", cota_modelo: "F:82%!" },
+    alertas: [{ tipo: "ctx", texto: "site-novo: contexto em 71% — hora de /compact ou handoff" },
+              { tipo: "cota", texto: "Cota do modelo em alerta: F:82%!" }],
+    sessoes: [s("site-novo", "site-novo", null, "Fable 5.2", "high", 71, 3.4, "ativa", 12),
+              s(null, "wifi", "relatorios", "Opus 5.5", "medium", 22, 2.1, "ativa", 40),
+              s("bot", "meubot", null, "Sonnet 5.5", "low", 9, .6, "ativa", 95),
+              s(null, "curso", null, "Opus 5.5", "medium", 48, 1.8, "parada", 2400)]
+  };
+}
+
+/* ---------- dados ---------- */
+async function carregar() {
+  try {
+    const r = await fetch("sessoes.json?t=" + Date.now(), { cache: "no-store" });
+    if (!r.ok) throw new Error(r.status);
+    dados = await r.json(); exemplo = false;
+  } catch (e) { dados = exemplos(); exemplo = true; }
+  $("selExemplo").hidden = !exemplo;
+  desenhar();
+}
+
+const nivel = p => p >= 80 ? "cr" : p >= 60 ? "al" : "";
+const fmtTok = n => n == null ? "—" : n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
+const fmtIdade = s => s < 60 ? "agora" : s < 3600 ? Math.round(s / 60) + " min" : Math.round(s / 3600) + " h";
+function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+
+function desenhar() {
+  const R = dados.resumo || {}, lista = $("sessoes");
+  let ses = dados.sessoes || [];
+  if (soAtivas) ses = ses.filter(s => s.estado === "ativa");
+  lista.replaceChildren();
+  if (!ses.length) {
+    const li = el("li", "vazio");
+    li.innerHTML = 'Nenhuma sessão ainda. Ligue o retrato: <code>export STATUSLINE_RETRATO=1</code> antes de abrir o <code>claude</code>.';
+    lista.append(li);
+  }
+  for (const s of ses) {
+    const li = el("li"), ctx = s.ctx_pct ?? 0;
+    li.append(el("span", "ponto " + (s.estado === "parada" ? "parada" : ctx >= 60 ? "quente" : "")));
+    const nome = el("span", "nome", s.nome || s.projeto || "?");
+    if (s.ativo) { nome.append(" "); nome.append(el("span", "seta", "→ " + s.ativo)); }
+    li.append(nome, el("span", "rot", s.estado === "ativa" ? fmtIdade(s.idade_s) : "parada · " + fmtIdade(s.idade_s)));
+    const det = el("div", "det");
+    const par = (rot, v) => { const x = el("span"); x.append(rot + " "); x.append(el("b", null, v)); det.append(x); };
+    par("", (s.modelo || "?") + (s.esforco ? "/" + s.esforco : ""));
+    par("ctx", ctx + "%");
+    if (s.custo_usd != null) par("US$", Number(s.custo_usd).toFixed(2));
+    if (s.contas) det.append(el("span", null, s.contas));
+    li.append(det);
+    const b = el("div", "barrinha"), i = el("i", nivel(ctx)); i.style.width = Math.min(100, ctx) + "%"; b.append(i); li.append(b);
+    lista.append(li);
+  }
+  $("subSes").textContent = `${R.ativas ?? 0} ativa(s) · ${R.paradas ?? 0} parada(s) nas últimas 2 h`;
+
+  // núcleo
+  const num = $("numeros"); num.replaceChildren();
+  const caixa = (rot, v, al) => { const d = el("div", al ? "al" : ""); d.append(el("b", null, v), rot); num.append(d); };
+  caixa("ativas", String(R.ativas ?? 0));
+  caixa("5 h", R.cota_5h == null ? "—" : R.cota_5h + "%", (R.cota_5h ?? 0) >= 80);
+  caixa("semana", R.cota_semana == null ? "—" : R.cota_semana + "%", (R.cota_semana ?? 0) >= 80);
+  caixa("US$ sessões", (R.custo_usd ?? 0).toFixed(2));
+  caixa("tokens hoje", fmtTok(R.tokens_dia));
+  const al = dados.alertas || [];
+  $("status").textContent = al.length ? al.length + " ponto(s) de atenção" : (R.ativas ? "tudo em ordem" : "nenhuma sessão ativa");
+
+  // cotas
+  const cotas = $("cotas"); cotas.replaceChildren();
+  const trilho = (rot, p, reset) => {
+    const c = el("div", "cota"), l = el("div", "lin");
+    l.append(el("span", null, rot + (reset ? " · reset " + reset : "")), el("b", null, p == null ? "—" : p + "%"));
+    const t = el("div", "trilho"), i = el("i", nivel(p ?? 0)); i.style.width = Math.min(100, p ?? 0) + "%"; t.append(i);
+    c.append(l, t); cotas.append(c);
+  };
+  trilho("5 horas", R.cota_5h, R.cota_5h_reset);
+  trilho("Semanal (todos os modelos)", R.cota_semana, R.cota_semana_reset);
+  if (R.cota_modelo) {
+    const m = /^(\S+?):(\d+)%/.exec(R.cota_modelo);
+    trilho("Semanal do modelo " + (m ? m[1] : ""), m ? Number(m[2]) : null, null);
+  }
+  const ul = $("alertas"); ul.replaceChildren();
+  if (!al.length) ul.append(el("li", "vazio", "Nada pedindo você agora."));
+  for (const a of al) { const li = el("li"); li.append(el("span", "ponto quente"), el("span", "txt", a.texto)); ul.append(li); }
+  if (REDUZ) requestAnimationFrame(quadro);
+}
+
+/* ---------- voz e comandos ---------- */
+function dizer(txt) {
+  $("resposta").textContent = "> " + txt;
+  if (!voz || !("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(txt); u.lang = "pt-BR";
+  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith("pt"));
+  if (v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+function status() {
+  if (!dados) return;
+  const R = dados.resumo || {}, al = dados.alertas || [];
+  let t = `${R.ativas ?? 0} sessões ativas.`;
+  if (R.cota_5h != null) t += ` Cota de cinco horas em ${R.cota_5h} por cento.`;
+  if (R.cota_semana != null) t += ` Semanal em ${R.cota_semana} por cento.`;
+  t += al.length ? ` Atenção: ${al.map(a => a.texto).join(". ")}.` : " Nada pedindo você.";
+  dizer(t);
+}
+$("bStatus").onclick = status;
+$("bAtivas").onclick = () => { soAtivas = !soAtivas; $("bAtivas").classList.toggle("on", soAtivas); $("bAtivas").setAttribute("aria-pressed", soAtivas); desenhar(); };
+$("bFoco").onclick = () => { const on = document.body.classList.toggle("foco"); $("bFoco").classList.toggle("on", on); $("bFoco").setAttribute("aria-pressed", on); };
+$("voz").onclick = () => { voz = !voz; const b = $("voz"); b.textContent = "Voz: " + (voz ? "ligada" : "desligada"); b.classList.toggle("desl", !voz); b.setAttribute("aria-pressed", voz); if (voz) status(); };
+document.addEventListener("keydown", e => {
+  if (e.target.closest && e.target.closest("input,textarea")) return;
+  ({ "1": () => $("bStatus").click(), "2": () => $("bAtivas").click(), "3": () => $("bFoco").click() })[e.key]?.();
+});
+
+/* ---------- relógio ---------- */
+function relogio() {
+  const d = new Date();
+  $("relogio").textContent = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  $("data").textContent = d.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" });
+}
+relogio(); setInterval(relogio, 15000);
+
+/* ---------- núcleo (anéis) ---------- */
+const cv = $("cv"), cx = cv.getContext("2d");
+const ANEIS = [{ r: .84, v: .18, seg: 64, w: 2, gap: .35 }, { r: .74, v: -.42, seg: 6, w: 6, gap: .5 }, { r: .64, v: .9, seg: 24, w: 3, gap: .3 }];
+const t0 = performance.now(); let visivel = true;
+document.addEventListener("visibilitychange", () => { visivel = !document.hidden; if (visivel) requestAnimationFrame(quadro); });
+function quadro(agora) {
+  if (!visivel) return;
+  const t = (agora - t0) / 1000, W = cv.width, H = cv.height, R = Math.min(W, H) / 2, c = { x: W / 2, y: H / 2 }, k = W / 520;
+  const quente = dados && (dados.alertas || []).length;
+  const cor = quente ? "255,176,32" : "95,227,255";
+  cx.clearRect(0, 0, W, H);
+  const pulso = REDUZ ? .7 : .55 + .45 * (0.5 + 0.5 * Math.sin(t * 2.1));
+  const g = cx.createRadialGradient(c.x, c.y, 0, c.x, c.y, R * .62);
+  g.addColorStop(0, "rgba(160,240,255," + (.30 * pulso) + ")"); g.addColorStop(.6, "rgba(" + cor + "," + (.12 * pulso) + ")"); g.addColorStop(1, "rgba(0,0,0,0)");
+  cx.fillStyle = g; cx.beginPath(); cx.arc(c.x, c.y, R * .62, 0, 7); cx.fill();
+  ANEIS.forEach((a, i) => {
+    const rot = REDUZ ? i : t * a.v, rr = R * a.r, passo = Math.PI * 2 / a.seg;
+    cx.beginPath();
+    for (let s = 0; s < a.seg; s++) { const ini = rot + s * passo; cx.moveTo(c.x + Math.cos(ini) * rr, c.y + Math.sin(ini) * rr); cx.arc(c.x, c.y, rr, ini, ini + passo * (1 - a.gap)); }
+    cx.lineWidth = a.w * 3.5 * k; cx.strokeStyle = "rgba(" + cor + "," + (.10 + .10 * pulso) + ")"; cx.stroke();
+    cx.lineWidth = a.w * k; cx.strokeStyle = i === 1 ? "rgba(232,247,255,.9)" : "rgba(" + cor + "," + (.6 + .35 * pulso) + ")"; cx.stroke();
+  });
+  // arco de cota de 5 h por fora
+  const p5 = dados && dados.resumo && dados.resumo.cota_5h;
+  if (p5 != null) {
+    cx.beginPath(); cx.arc(c.x, c.y, R * .95, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, p5 / 100));
+    cx.lineWidth = 4 * k; cx.strokeStyle = p5 >= 80 ? "rgba(255,93,108,.9)" : p5 >= 60 ? "rgba(255,176,32,.9)" : "rgba(95,227,255,.7)"; cx.stroke();
+  }
+  if (!REDUZ) requestAnimationFrame(quadro);
+}
+requestAnimationFrame(quadro);
+
+carregar();
+setInterval(carregar, 10000);
+})();
+</script>
+</body>
+</html>

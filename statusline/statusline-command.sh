@@ -217,5 +217,28 @@ except Exception: pass' "$CX_DIR/auth.json" 2>/dev/null)
   contas=$(cat "$CONTAS_CACHE" 2>/dev/null)
 fi
 
+# ── Retrato da sessão para o painel (opcional) ───────────────────────────
+# STATUSLINE_RETRATO=1 grava um JSON pequeno por sessão em
+# ${STATUSLINE_RETRATO_DIR:-~/.local/share/claude-session-kit/sessoes}/<session_id>.json,
+# que o painel/ do kit lê. Desligado por padrão. Nenhum token vai para o arquivo.
+if [[ "${STATUSLINE_RETRATO:-0}" == "1" ]]; then
+  sid=$(echo "$input" | jq -r '.session_id // empty' 2>/dev/null)
+  if [[ "$sid" =~ ^[A-Za-z0-9-]{8,64}$ ]]; then
+    rdir="${STATUSLINE_RETRATO_DIR:-$HOME/.local/share/claude-session-kit/sessoes}"
+    mkdir -p "$rdir" 2>/dev/null
+    echo "$input" | jq -c --arg em "$(date +%s)" --arg ativo "$ativo" --arg contas "${contas# }" \
+      --arg h5 "${h5_pct:-}" --arg h5r "${h5_reset:-}" --arg w "${w_pct:-}" --arg wr "${w_reset:-}" --arg ws "${ws:-}" --arg d "${d:-0}" \
+      '{em:($em|tonumber), session_id, nome:(.session_name // null), cwd,
+        ativo:(if $ativo=="" then null else $ativo end), contas:(if $contas=="" then null else $contas end),
+        modelo:.model.display_name, modelo_id:.model.id, esforco:(.effort.level // null),
+        ctx_pct:(.context_window.used_percentage // null), custo_usd:(.cost.total_cost_usd // null),
+        dur_ms:(.cost.total_duration_ms // null), linhas_mais:(.cost.total_lines_added // null), linhas_menos:(.cost.total_lines_removed // null),
+        cota_5h:(if $h5=="" then null else ($h5|tonumber? // null) end), cota_5h_reset:(if $h5r=="" then null else $h5r end),
+        cota_semana:(if $w=="" then null else ($w|tonumber? // null) end), cota_semana_reset:(if $wr=="" then null else $wr end),
+        cota_modelo:(if $ws=="" then null else $ws end), tokens_dia:($d|tonumber? // 0), versao:(.version // null)}' \
+      > "$rdir/.$sid.tmp" 2>/dev/null && mv -f "$rdir/.$sid.tmp" "$rdir/$sid.json" 2>/dev/null
+  fi
+fi
+
 printf "\033[01;32m%s@%s\033[00m:\033[01;34m%s\033[00m\033[01;33m%s\033[00m\033[38;5;180m%s\033[00m%s\033[38;5;244m%s\033[00m\033[38;5;117m%s\033[00m" \
   "$(whoami)" "$(hostname -s)" "$cwd" "$proj" "$me" "$ctx" "$limits" "$contas"

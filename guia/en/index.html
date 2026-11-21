@@ -216,6 +216,13 @@
 <span class="k">qual modelo uso?</span>      <span class="c"># when F: shows "!" → maestro-roteador</span>
 <span class="k">analisar minhas sessões</span> <span class="c"># playbook by model from the JSONL files → fable-mindset</span></pre>
 </div></div>
+<div class="step"><div class="b">7</div><div>
+<h3>Sessions dashboard (optional)</h3>
+<p>Enable the statusline snapshot and open a Jarvis-style dashboard with all sessions: context, model, cost, active project, and account quota. Runs only on your computer (127.0.0.1), read-only, and needs nothing beyond Python 3.</p>
+<pre><span class="k">export</span> STATUSLINE_RETRATO=1          <span class="c"># in ~/.bashrc: the bar starts saving a snapshot for each session</span>
+<span class="k">python3</span> painel/painel.py            <span class="c"># opens at http://127.0.0.1:8781</span></pre>
+<p>Without the server, the page shows sample data: <a href="../../painel/">view the dashboard in demo mode</a>.</p>
+</div></div>
 </div></section>
 <section id="exemplos"><div class="wrap">
 <span class="chip">Examples</span>
@@ -235,6 +242,7 @@
 <p class="sub">Open items noted in the plan.</p>
 <div class="phase"><div class="tag">done</div><div class="d"><strong>Per-model quota in the bar</strong><span>The API started sending <code>weekly_scoped</code>; the script reads <code>.limits[]</code> and shows <code>F:</code> alongside <code>w:</code>.</span></div></div>
 <div class="phase"><div class="tag">done</div><div class="d"><strong>Quota per account and active project</strong><span>With <code>CLAUDE_CONFIG_DIR</code>, each login has its own token and quota cache. <code>→ X</code> shows the project the work moved to; <code>cc:</code>/<code>cx:</code> show the Claude and Codex accounts (turn off with <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
+<div class="phase"><div class="tag">done</div><div class="d"><strong>Sessions dashboard</strong><span><code>STATUSLINE_RETRATO=1</code> saves a snapshot for each session; <code>painel/painel.py</code> displays them all in one place, in the Jarvis style.</span></div></div>
 <div class="phase"><div class="tag">next</div><div class="d"><strong>PreCompact hook</strong><span>Run session-statusline automatically before every <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">next</div><div class="d"><strong>Context colors</strong><span>Green, amber, and red at the 40 / 60 / 80 % thresholds.</span></div></div>
 <div class="phase"><div class="tag">idea</div><div class="d"><strong>Single "session-audit" skill</strong><span>Chain checkpoint → memory-audit → handoff in a single call.</span></div></div>

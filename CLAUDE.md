@@ -4,7 +4,8 @@ Repo: `inematds/claude-session-kit`. Autor dos commits: `inematds <inematds@gmai
 
 Conteúdo: statusline (script + prompt), skills de sessão (session-statusline,
 memory-audit, session-handoff), skills de apoio (maestro-roteador — origem em
-`~/projetos/maestro-roteador`; fable-mindset) e o plano de otimização. Base teórica:
+`~/projetos/maestro-roteador`; fable-mindset), o painel das sessões (`painel/`: lê os retratos
+que a statusline grava com `STATUSLINE_RETRATO=1`; testes `python3 -m unittest painel/test_painel.py`) e o plano de otimização. Base teórica:
 curso cctop (`~/projetos/cctop`, https://inematds.github.io/cctop/). As cópias "vivas" das
 skills ficam em `~/.claude/skills/`; ao alterar uma, atualizar aqui também.
 

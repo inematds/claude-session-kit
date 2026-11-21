@@ -24,6 +24,9 @@ skills/
   session-handoff/        structured summary before /clear
   maestro-roteador/       chooses model and effort before dispatching (when the quota gets tight)
   fable-mindset/          mines session JSONL files and generates a playbook for each model
+painel/
+  painel.py               local server (127.0.0.1:8781), read-only
+  index.html              the Jarvis-style screen (shows sample data without the server)
 PLANO-OTIMIZACAO.md       the checkpoint → audit → handoff cycle and its triggers
 ```
 
@@ -41,6 +44,20 @@ is the one that gets blocked first—the old script only showed `w:`, which made
 Installation: paste `statusline/PROMPT.md` into a Claude Code session, or do it
 manually: copy the script to `~/.claude/statusline-command.sh` and add the block from
 `settings-snippet.json` to `~/.claude/settings.json`.
+
+### Accounts and active project
+
+`→ X` shows the project where the work went (root folder in `STATUSLINE_PROJETOS`, default `~/projetos`); `cc:`/`cx:` show the Claude and Codex accounts (disable with `STATUSLINE_CONTAS=0`). With `CLAUDE_CONFIG_DIR`, each login has its own quota cache.
+
+## Dashboard (optional)
+
+With `STATUSLINE_RETRATO=1`, the statusline saves a small JSON file for each session in `~/.local/share/claude-session-kit/sessoes/` (no token). `python3 painel/painel.py` opens a screen at http://127.0.0.1:8781 with all sessions (context, model, cost, active project, accounts) and the account quota, with alerts when context exceeds 60% or quota exceeds 80%. Read-only; nothing is executed. Demo with sample data:
+https://inematds.github.io/claude-session-kit/painel/
+
+```bash
+export STATUSLINE_RETRATO=1
+python3 painel/painel.py
+```
 
 ## Skills
 
