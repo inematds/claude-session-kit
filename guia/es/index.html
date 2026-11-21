@@ -186,17 +186,19 @@
 <h3>Prueba la renderización</h3>
 <p>Ejecuta el script con un payload mínimo y verifica la línea.</p>
 <pre><span class="k">echo</span> <span class="s">'{"cwd":"'$PWD'","model":{"display_name":"Fable 5.1"}}'</span> | <span class="k">bash</span> ~/.claude/statusline-command.sh
-<span class="c"># user@host:~/proj Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M</span></pre>
+<span class="c"># user@host:~/proj → otro Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M  cc:tu cx:tu</span></pre>
 </div></div>
 <div class="step"><div class="b">4</div><div>
 <h3>Lee la barra</h3>
 <p>Cada campo tiene un significado y un desencadenante en el plan.</p>
-<pre><span class="k">ctx 41%</span>          <span class="c"># % de la ventana de contexto usada en esta sesión</span>
+<pre><span class="k">→ otro</span>          <span class="c"># la sesión se abrió en ~/proj, pero el trabajo se trasladó a otro proyecto</span>
+<span class="k">ctx 41%</span>          <span class="c"># % de la ventana de contexto usada en esta sesión</span>
 <span class="k">5h:2%→19:10</span>      <span class="c"># límite de 5 horas y hora local del reinicio</span>
 <span class="k">w:69%</span>            <span class="c"># límite semanal de todos los modelos (weekly_all)</span>
 <span class="k">F:80%!</span>           <span class="c"># límite semanal del modelo en uso (weekly_scoped) — "!" = alerta</span>
 <span class="k">→14/09 21:00</span>     <span class="c"># cuando se reinicia el límite semanal</span>
-<span class="k">d:40.9M</span>          <span class="c"># tokens del día, contados en los JSONL locales</span></pre>
+<span class="k">d:40.9M</span>          <span class="c"># tokens del día, contados en los JSONL locales</span>
+<span class="k">cc:tu cx:tu</span>  <span class="c"># cuenta de Claude de esta sesión y cuenta de Codex (inicio del correo electrónico)</span></pre>
 </div></div>
 <div class="step"><div class="b">5</div><div>
 <h3>Instala las skills</h3>
@@ -232,6 +234,7 @@
 <h2>Lo que sigue</h2>
 <p class="sub">Pendientes anotados en el plan.</p>
 <div class="phase"><div class="tag">hecho</div><div class="d"><strong>Cuota por modelo en la barra</strong><span>La API empezó a enviar <code>weekly_scoped</code>; el script lee <code>.limits[]</code> y muestra <code>F:</code> al lado de <code>w:</code>.</span></div></div>
+<div class="phase"><div class="tag">hecho</div><div class="d"><strong>Cuota por cuenta y proyecto activo</strong><span>Con <code>CLAUDE_CONFIG_DIR</code>, cada inicio de sesión tiene su propio token y caché de cuota. <code>→ X</code> muestra el proyecto al que se trasladó el trabajo; <code>cc:</code>/<code>cx:</code> muestran las cuentas de Claude y Codex (desactívalo con <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Ejecutar automáticamente session-statusline antes de cada <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Colores en el contexto</strong><span>Verde, ámbar y rojo en los cortes de 40 / 60 / 80 %.</span></div></div>
 <div class="phase"><div class="tag">idea</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadenar checkpoint → memory-audit → handoff en una sola llamada.</span></div></div>

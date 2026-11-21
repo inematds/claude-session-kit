@@ -1,5 +1,5 @@
 #!/bin/bash
-# Statusline: user@host:cwd · ctx N% · 5h:X% · w:Y% F:Z% · d:TOK
+# Statusline: user@host:cwd → projeto · ctx N% · 5h:X% · w:Y% F:Z% · d:TOK · cc:conta cx:conta
 #
 # 5h% e w% vêm do endpoint oficial do Claude Code:
 #   GET https://api.anthropic.com/api/oauth/usage
@@ -51,7 +51,11 @@ if [[ -n "$transcript" && -f "$transcript" ]]; then
 fi
 
 # ── 5h% + w% via API (cache 300s) ────────────────────────────────────────
-LIMITS_CACHE="/tmp/cc_limits_${UID}.json"
+# Cada pasta de login (CLAUDE_CONFIG_DIR) tem seu próprio token e seu próprio cache:
+# quem alterna duas contas vê a cota da conta certa.
+CC_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+if [[ "$CC_DIR" == "$HOME/.claude" ]]; then LIMITS_CACHE="/tmp/cc_limits_${UID}.json"
+else LIMITS_CACHE="/tmp/cc_limits_${UID}_$(basename "$CC_DIR").json"; fi
 refresh_api=1
 if [[ -f "$LIMITS_CACHE" ]]; then
   age=$(( $(date +%s) - $(stat -c %Y "$LIMITS_CACHE" 2>/dev/null || echo 0) ))
@@ -61,7 +65,7 @@ fi
 if [[ $refresh_api -eq 1 ]]; then
   # Refetch em background pra não bloquear render
   (
-    TOKEN=$(jq -r '.claudeAiOauth.accessToken // empty' ~/.claude/.credentials.json 2>/dev/null)
+    TOKEN=$(jq -r '.claudeAiOauth.accessToken // empty' "$CC_DIR/.credentials.json" 2>/dev/null)
     if [[ -n "$TOKEN" ]]; then
       tmp=$(mktemp)
       code=$(curl -s --max-time 4 \
@@ -93,7 +97,7 @@ if [[ -f "$LIMITS_CACHE" ]]; then
   # kind=weekly_scoped (ex.: Fable) além do weekly_all. O scoped é o que trava
   # de verdade quando is_active=true, e .seven_day só reflete o weekly_all.
   # Mostra como "<Inicial>:<pct>%" e acrescenta "!" se severity != normal.
-  ws=$(jq -r 'try ([.limits[]? | select(.kind=="weekly_scoped")] | first
+  ws=$(jq -r 'try (first(.limits[]? | select(.kind=="weekly_scoped"))
        | "\(.scope.model.display_name // "M" | .[0:1]):\(.percent | tostring)%\(if .severity != "normal" then "!" else "" end)")
        catch empty' "$LIMITS_CACHE" 2>/dev/null)
 fi
@@ -167,5 +171,51 @@ if [[ -n "$w_pct" ]]; then
 fi
 limits+=" d:$(fmt "$d")"
 
-printf "\033[01;32m%s@%s\033[00m:\033[01;34m%s\033[00m\033[38;5;180m%s\033[00m%s\033[38;5;244m%s\033[00m" \
-  "$(whoami)" "$(hostname -s)" "$cwd" "$me" "$ctx" "$limits"
+# ── Projeto ativo: "→ X" em amarelo ──────────────────────────────────────
+# A sessão fica presa na pasta onde abriu; quando o trabalho vai para outro
+# projeto dentro de $STATUSLINE_PROJETOS (padrão ~/projetos), mostra "→ X".
+# Fonte: últimos 50 tool_use do transcript; vale o mais recente que é pasta
+# e não é o projeto da própria sessão.
+PROJ_ROOT="${STATUSLINE_PROJETOS:-$HOME/projetos}"; PROJ_ROOT=${PROJ_ROOT%/}
+proj_base=$(basename "$PROJ_ROOT")
+sessao=""
+[[ "$cwd" == "$PROJ_ROOT/"* ]] && { sessao=${cwd#"$PROJ_ROOT/"}; sessao=${sessao%%/*}; }
+ativo=""
+if [[ -n "$transcript" && -f "$transcript" && -d "$PROJ_ROOT" ]]; then
+  while read -r p; do
+    p=${p#*"$proj_base"/}
+    [[ -n "$p" && "$p" != "$sessao" && -d "$PROJ_ROOT/$p" ]] && { ativo=$p; break; }
+  done < <(tac "$transcript" 2>/dev/null | grep -m50 '"tool_use"' | \
+           grep -oE "(${PROJ_ROOT}|~${PROJ_ROOT#"$HOME"})/[A-Za-z0-9._-]+")
+fi
+proj=""
+[[ -n "$ativo" ]] && proj=" → ${ativo}"
+
+# ── Contas em uso: cc = Claude desta sessão, cx = Codex (se instalado) ───
+# Mostra só o começo do e-mail. Cache 300 s; nenhum token sai daqui.
+# STATUSLINE_CONTAS=0 desliga.
+contas=""
+if [[ "${STATUSLINE_CONTAS:-1}" != "0" ]]; then
+  CX_DIR="${CODEX_HOME:-$HOME/.codex}"
+  CONTAS_CACHE="/tmp/cc_contas_${UID}_$(basename "$CC_DIR")_$(basename "$CX_DIR").txt"
+  if [[ ! -f "$CONTAS_CACHE" || $(( $(date +%s) - $(stat -c %Y "$CONTAS_CACHE" 2>/dev/null || echo 0) )) -ge 300 ]]; then
+    if [[ "$CC_DIR" == "$HOME/.claude" ]]; then cj="$HOME/.claude.json"; else cj="$CC_DIR/.claude.json"; fi
+    cc_mail=$(jq -r '.oauthAccount.emailAddress // empty' "$cj" 2>/dev/null)
+    cx_mail=""
+    if [[ -f "$CX_DIR/auth.json" ]] && command -v python3 >/dev/null; then
+      cx_mail=$(python3 -I -c 'import json,base64,sys
+try:
+  p=json.load(open(sys.argv[1]))["tokens"]["id_token"].split(".")[1]; p+="="*(-len(p)%4)
+  print(json.loads(base64.urlsafe_b64decode(p)).get("email",""))
+except Exception: pass' "$CX_DIR/auth.json" 2>/dev/null)
+    fi
+    out=""
+    [[ -n "$cc_mail" ]] && out+=" cc:${cc_mail%%@*}"
+    [[ -n "$cx_mail" ]] && out+=" cx:${cx_mail%%@*}"
+    printf '%s' "$out" > "$CONTAS_CACHE" 2>/dev/null
+  fi
+  contas=$(cat "$CONTAS_CACHE" 2>/dev/null)
+fi
+
+printf "\033[01;32m%s@%s\033[00m:\033[01;34m%s\033[00m\033[01;33m%s\033[00m\033[38;5;180m%s\033[00m%s\033[38;5;244m%s\033[00m\033[38;5;117m%s\033[00m" \
+  "$(whoami)" "$(hostname -s)" "$cwd" "$proj" "$me" "$ctx" "$limits" "$contas"

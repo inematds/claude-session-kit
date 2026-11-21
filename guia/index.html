@@ -186,17 +186,19 @@
 <h3>Teste a renderização</h3>
 <p>Rode o script com um payload mínimo e confira a linha.</p>
 <pre><span class="k">echo</span> <span class="s">'{"cwd":"'$PWD'","model":{"display_name":"Fable 5.1"}}'</span> | <span class="k">bash</span> ~/.claude/statusline-command.sh
-<span class="c"># user@host:~/proj Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M</span></pre>
+<span class="c"># user@host:~/proj → outro Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M  cc:voce cx:voce</span></pre>
 </div></div>
 <div class="step"><div class="b">4</div><div>
 <h3>Leia a barra</h3>
 <p>Cada campo tem um significado e um gatilho no plano.</p>
-<pre><span class="k">ctx 41%</span>          <span class="c"># % da janela de contexto usada nesta sessão</span>
+<pre><span class="k">→ outro</span>          <span class="c"># a sessão abriu em ~/proj, mas o trabalho foi para outro projeto</span>
+<span class="k">ctx 41%</span>          <span class="c"># % da janela de contexto usada nesta sessão</span>
 <span class="k">5h:2%→19:10</span>      <span class="c"># cota de 5 horas e a hora local do reset</span>
 <span class="k">w:69%</span>            <span class="c"># cota semanal de todos os modelos (weekly_all)</span>
 <span class="k">F:80%!</span>           <span class="c"># cota semanal do modelo em uso (weekly_scoped) — "!" = alerta</span>
 <span class="k">→14/09 21:00</span>     <span class="c"># quando a semanal reseta</span>
-<span class="k">d:40.9M</span>          <span class="c"># tokens do dia, contados nos JSONL locais</span></pre>
+<span class="k">d:40.9M</span>          <span class="c"># tokens do dia, contados nos JSONL locais</span>
+<span class="k">cc:voce cx:voce</span>  <span class="c"># conta do Claude desta sessão e conta do Codex (começo do e-mail)</span></pre>
 </div></div>
 <div class="step"><div class="b">5</div><div>
 <h3>Instale as skills</h3>
@@ -232,6 +234,7 @@
 <h2>O que vem depois</h2>
 <p class="sub">Pendências anotadas no plano.</p>
 <div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por modelo na barra</strong><span>A API passou a mandar <code>weekly_scoped</code>; o script lê <code>.limits[]</code> e mostra <code>F:</code> ao lado de <code>w:</code>.</span></div></div>
+<div class="phase"><div class="tag">feito</div><div class="d"><strong>Cota por conta e projeto ativo</strong><span>Com <code>CLAUDE_CONFIG_DIR</code>, cada login tem seu próprio token e cache de cota. <code>→ X</code> mostra o projeto para onde o trabalho foi; <code>cc:</code>/<code>cx:</code> mostram as contas do Claude e do Codex (desligue com <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Hook PreCompact</strong><span>Rodar a session-statusline automaticamente antes de todo <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">próximo</div><div class="d"><strong>Cores no ctx</strong><span>Verde, âmbar e vermelho nos cortes 40 / 60 / 80 %.</span></div></div>
 <div class="phase"><div class="tag">ideia</div><div class="d"><strong>Skill única "session-audit"</strong><span>Encadear checkpoint → memory-audit → handoff numa chamada só.</span></div></div>

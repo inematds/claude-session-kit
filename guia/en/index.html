@@ -186,17 +186,19 @@
 <h3>Test the rendering</h3>
 <p>Run the script with a minimal payload and check the line.</p>
 <pre><span class="k">echo</span> <span class="s">'{"cwd":"'$PWD'","model":{"display_name":"Fable 5.1"}}'</span> | <span class="k">bash</span> ~/.claude/statusline-command.sh
-<span class="c"># user@host:~/proj Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M</span></pre>
+<span class="c"># user@host:~/proj → other Fable 5.1  ctx 41%  5h:2%→19:10  w:69% F:80%!→14/09 21:00  d:40.9M  cc:you cx:you</span></pre>
 </div></div>
 <div class="step"><div class="b">4</div><div>
 <h3>Read the bar</h3>
 <p>Each field has a meaning and a trigger in the plan.</p>
-<pre><span class="k">ctx 41%</span>          <span class="c"># % of context window used in this session</span>
+<pre><span class="k">→ other</span>          <span class="c"># the session started in ~/proj, but the work moved to another project</span>
+<span class="k">ctx 41%</span>          <span class="c"># % of context window used in this session</span>
 <span class="k">5h:2%→19:10</span>      <span class="c"># 5-hour quota and local reset time</span>
 <span class="k">w:69%</span>            <span class="c"># weekly quota for all models (weekly_all)</span>
 <span class="k">F:80%!</span>           <span class="c"># weekly quota for the model in use (weekly_scoped) — "!" = alert</span>
 <span class="k">→14/09 21:00</span>     <span class="c"># when the weekly quota resets</span>
-<span class="k">d:40.9M</span>          <span class="c"># daily tokens, counted from local JSONL files</span></pre>
+<span class="k">d:40.9M</span>          <span class="c"># daily tokens, counted from local JSONL files</span>
+<span class="k">cc:you cx:you</span>  <span class="c"># Claude account for this session and Codex account (beginning of the email)</span></pre>
 </div></div>
 <div class="step"><div class="b">5</div><div>
 <h3>Install the skills</h3>
@@ -232,6 +234,7 @@
 <h2>What comes next</h2>
 <p class="sub">Open items noted in the plan.</p>
 <div class="phase"><div class="tag">done</div><div class="d"><strong>Per-model quota in the bar</strong><span>The API started sending <code>weekly_scoped</code>; the script reads <code>.limits[]</code> and shows <code>F:</code> alongside <code>w:</code>.</span></div></div>
+<div class="phase"><div class="tag">done</div><div class="d"><strong>Quota per account and active project</strong><span>With <code>CLAUDE_CONFIG_DIR</code>, each login has its own token and quota cache. <code>→ X</code> shows the project the work moved to; <code>cc:</code>/<code>cx:</code> show the Claude and Codex accounts (turn off with <code>STATUSLINE_CONTAS=0</code>).</span></div></div>
 <div class="phase"><div class="tag">next</div><div class="d"><strong>PreCompact hook</strong><span>Run session-statusline automatically before every <code>/compact</code>.</span></div></div>
 <div class="phase"><div class="tag">next</div><div class="d"><strong>Context colors</strong><span>Green, amber, and red at the 40 / 60 / 80 % thresholds.</span></div></div>
 <div class="phase"><div class="tag">idea</div><div class="d"><strong>Single "session-audit" skill</strong><span>Chain checkpoint → memory-audit → handoff in a single call.</span></div></div>
