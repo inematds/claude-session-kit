@@ -26,6 +26,11 @@ header{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-bottom:1px
 .selo{font:600 11px var(--mono);letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--linha);color:var(--ciano);
   background:transparent;border-radius:999px;padding:6px 12px;cursor:pointer;min-height:32px}
 .selo.desl{color:var(--mut)}
+.langs{display:flex;gap:4px}
+.langs a{font:600 11px var(--mono);letter-spacing:.12em;color:var(--mut);text-decoration:none;border:1px solid transparent;border-radius:6px;padding:5px 7px;min-height:28px}
+.langs a.on{color:var(--ciano);border-color:var(--linha)}
+.langs a:hover{color:var(--gelo)}
+.langs a:focus-visible{outline:2px solid var(--ciano);outline-offset:2px}
 .exemplo{font:600 11px var(--mono);color:var(--alerta);border:1px solid var(--alerta);border-radius:4px;padding:1px 6px}
 button:focus-visible{outline:2px solid var(--ciano);outline-offset:2px}
 main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr) minmax(0,.9fr);gap:16px;align-items:stretch;min-height:0}
@@ -49,6 +54,7 @@ main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,1fr) minma
 .barrinha i{display:block;height:100%;background:var(--ciano)}
 .barrinha i.al{background:var(--alerta)} .barrinha i.cr{background:var(--erro)}
 .vazio{font-size:14px;color:var(--mut);padding:10px 2px}
+.lista li.vazio{display:block}
 .vazio code{font:12px var(--mono);color:var(--gelo);background:rgba(95,227,255,.08);padding:1px 5px;border-radius:4px}
 /* núcleo */
 .nucleo{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:360px}
@@ -91,45 +97,46 @@ body.foco .painel{opacity:.15}
 <body>
 <div class="app">
   <header>
-    <span class="marca">JARVIS · SESSÕES</span>
-    <span class="exemplo" id="selExemplo" hidden>EXEMPLO</span>
+    <span class="marca" data-t="marca">JARVIS · SESSÕES</span>
+    <span class="exemplo" id="selExemplo" data-t="exemplo" hidden>EXEMPLO</span>
     <span class="data" id="data"></span>
     <span class="relogio" id="relogio">--:--</span>
+    <nav class="langs" aria-label="Idioma"><a href="?lang=pt" data-l="pt">PT</a><a href="?lang=en" data-l="en">EN</a><a href="?lang=es" data-l="es">ES</a></nav>
     <button class="selo desl" id="voz" aria-pressed="false">Voz: desligada</button>
   </header>
 
   <main>
     <section class="painel" aria-labelledby="hSes">
-      <h2 id="hSes">Sessões</h2>
-      <p class="sub" id="subSes">Cada terminal do Claude Code, do mais recente para o mais antigo.</p>
+      <h2 id="hSes" data-t="hSes">Sessões</h2>
+      <p class="sub" id="subSes" data-t="subSes0">Cada terminal do Claude Code, do mais recente para o mais antigo.</p>
       <ul class="lista" id="sessoes"></ul>
     </section>
 
-    <section class="nucleo" aria-label="Núcleo">
+    <section class="nucleo" aria-label="Núcleo" data-ta="ariaNucleo">
       <canvas id="cv" width="1000" height="1000" aria-hidden="true"></canvas>
       <div class="centro">
         <div class="nomeia">JARVIS</div>
-        <div class="status" id="status">lendo…</div>
+        <div class="status" id="status" data-t="lendo">lendo…</div>
       </div>
       <div class="numeros" id="numeros"></div>
     </section>
 
     <section class="painel" aria-labelledby="hCota">
-      <h2 id="hCota">Cota da conta</h2>
-      <p class="sub">Da sessão que atualizou por último.</p>
+      <h2 id="hCota" data-t="hCota">Cota da conta</h2>
+      <p class="sub" data-t="subCota">Da sessão que atualizou por último.</p>
       <div id="cotas"></div>
-      <h2 style="margin-top:6px">Atenção</h2>
+      <h2 style="margin-top:6px" data-t="hAtencao">Atenção</h2>
       <ul class="lista alertas" id="alertas"></ul>
     </section>
   </main>
 
   <footer>
     <div class="resposta" id="resposta" aria-live="polite"></div>
-    <div class="barra" role="toolbar" aria-label="Comandos">
+    <div class="barra" role="toolbar" aria-label="Comandos" data-ta="ariaCmd">
       <span class="pr">&gt;_</span>
-      <button id="bStatus">Status<kbd>1</kbd></button>
-      <button id="bAtivas" aria-pressed="false">Só ativas<kbd>2</kbd></button>
-      <button id="bFoco" aria-pressed="false">Modo foco<kbd>3</kbd></button>
+      <button id="bStatus"><span data-t="bStatus">Status</span><kbd>1</kbd></button>
+      <button id="bAtivas" aria-pressed="false"><span data-t="bAtivas">Só ativas</span><kbd>2</kbd></button>
+      <button id="bFoco" aria-pressed="false"><span data-t="bFoco">Modo foco</span><kbd>3</kbd></button>
     </div>
   </footer>
 </div>
@@ -141,6 +148,20 @@ const $ = id => document.getElementById(id);
 const REDUZ = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let dados = null, soAtivas = false, voz = false, exemplo = false;
 
+/* ---------- idioma: ?lang=pt|en|es, senão o do navegador ---------- */
+const I18N = {"pt":{"desc":"Painel das suas sessões do Claude Code: contexto, cota, modelo e projeto de cada uma, num lugar só. Só lê.","marca":"JARVIS · SESSÕES","exemplo":"EXEMPLO","vozOn":"Voz: ligada","vozOff":"Voz: desligada","hSes":"Sessões","subSes0":"Cada terminal do Claude Code, do mais recente para o mais antigo.","hCota":"Cota da conta","subCota":"Da sessão que atualizou por último.","hAtencao":"Atenção","bStatus":"Status","bAtivas":"Só ativas","bFoco":"Modo foco","lendo":"lendo…","vazio1":"Nenhuma sessão ainda. Ligue o retrato:","vazio2":"antes de abrir o","agora":"agora","parada":"parada","subSes":"{a} ativa(s) · {p} parada(s) nas últimas 2 h","cxAtivas":"ativas","cxSemana":"semana","cxCusto":"US$ sessões","cxTokens":"tokens hoje","stAtencao":"{n} ponto(s) de atenção","stOk":"tudo em ordem","stNenhuma":"nenhuma sessão ativa","c5h":"5 horas","cSemana":"Semanal (todos os modelos)","cModelo":"Semanal do modelo","reset":"reset","nadaAgora":"Nada pedindo você agora.","vzAtivas":"{n} sessões ativas.","vz5h":"Cota de cinco horas em {p} por cento.","vzSemana":"Semanal em {p} por cento.","vzAtencao":"Atenção:","vzNada":"Nada pedindo você.","alCtx":"{nome}: contexto em {p}% — hora de /compact ou handoff","al5h":"Cota de 5 h em {p}% (reset {r})","alSemana":"Cota semanal em {p}%","alModelo":"Cota do modelo em alerta: {m}","ariaCmd":"Comandos","ariaNucleo":"Núcleo"},"en":{"desc":"Your Claude Code sessions panel: each session’s context, quota, model, and project, all in one place. Read-only.","marca":"JARVIS · SESSIONS","exemplo":"EXAMPLE","vozOn":"Voice: on","vozOff":"Voice: off","hSes":"Sessions","subSes0":"Every Claude Code terminal, from newest to oldest.","hCota":"Account quota","subCota":"From the session updated most recently.","hAtencao":"Attention","bStatus":"Status","bAtivas":"Active only","bFoco":"Focus mode","lendo":"loading…","vazio1":"No sessions yet. Turn on the snapshot:","vazio2":"before opening","agora":"now","parada":"stopped","subSes":"{a} active · {p} stopped in the last 2 h","cxAtivas":"active","cxSemana":"week","cxCusto":"US$ sessions","cxTokens":"tokens today","stAtencao":"{n} item(s) need attention","stOk":"all clear","stNenhuma":"no active sessions","c5h":"5 hours","cSemana":"Weekly (all models)","cModelo":"Model weekly","reset":"reset","nadaAgora":"Nothing needs your attention right now.","vzAtivas":"{n} active sessions.","vz5h":"Five-hour quota at {p} percent.","vzSemana":"Weekly quota at {p} percent.","vzAtencao":"Attention:","vzNada":"Nothing needs your attention.","alCtx":"{nome}: context at {p}% — time for /compact or handoff","al5h":"5-hour quota at {p}% (reset {r})","alSemana":"Weekly quota at {p}%","alModelo":"Model quota alert: {m}","ariaCmd":"Commands","ariaNucleo":"Core"},"es":{"desc":"Panel de tus sesiones de Claude Code: contexto, cuota, modelo y proyecto de cada una, en un solo lugar. Solo lectura.","marca":"JARVIS · SESIONES","exemplo":"EJEMPLO","vozOn":"Voz: activada","vozOff":"Voz: desactivada","hSes":"Sesiones","subSes0":"Cada terminal de Claude Code, de la más reciente a la más antigua.","hCota":"Cuota de la cuenta","subCota":"De la sesión que se actualizó por última vez.","hAtencao":"Atención","bStatus":"Estado","bAtivas":"Solo activas","bFoco":"Modo enfoque","lendo":"leyendo…","vazio1":"Aún no hay sesiones. Activa el registro:","vazio2":"antes de abrir","agora":"ahora","parada":"detenida","subSes":"{a} activa(s) · {p} detenida(s) en las últimas 2 h","cxAtivas":"activas","cxSemana":"semana","cxCusto":"US$ sesiones","cxTokens":"tokens hoy","stAtencao":"{n} punto(s) de atención","stOk":"todo en orden","stNenhuma":"ninguna sesión activa","c5h":"5 horas","cSemana":"Semanal (todos los modelos)","cModelo":"Semanal del modelo","reset":"reinicio","nadaAgora":"Nada requiere tu atención ahora.","vzAtivas":"{n} sesiones activas.","vz5h":"Cuota de cinco horas al {p} por ciento.","vzSemana":"Semanal al {p} por ciento.","vzAtencao":"Atención:","vzNada":"Nada requiere tu atención.","alCtx":"{nome}: contexto al {p}% — hora de /compact o handoff","al5h":"Cuota de 5 h al {p}% (reinicio {r})","alSemana":"Cuota semanal al {p}%","alModelo":"Cuota del modelo en alerta: {m}","ariaCmd":"Comandos","ariaNucleo":"Núcleo"}};
+const pedido = (new URLSearchParams(location.search).get("lang") || navigator.language || "pt").slice(0, 2).toLowerCase();
+const LANG = I18N[pedido] ? pedido : "pt", L = I18N[LANG];
+const LOCALE = { pt: "pt-BR", en: "en-US", es: "es-ES" }[LANG];
+const T = (k, v) => (L[k] || I18N.pt[k] || k).replace(/\{(\w+)\}/g, (_, n) => v && v[n] != null ? v[n] : "");
+document.documentElement.lang = LOCALE;
+document.querySelector('meta[name="description"]').content = T("desc");
+document.title = T("marca").replace(" · ", " — ");
+document.querySelectorAll("[data-t]").forEach(e => { e.textContent = T(e.dataset.t); });
+document.querySelectorAll("[data-ta]").forEach(e => e.setAttribute("aria-label", T(e.dataset.ta)));
+document.querySelectorAll(".langs a").forEach(a => { if (a.dataset.l === LANG) { a.classList.add("on"); a.setAttribute("aria-current", "true"); } });
+$("voz").textContent = T("vozOff");
+
 /* ---------- exemplo (GitHub Pages ou sem servidor) ---------- */
 function exemplos() {
   const s = (nome, proj, ativo, modelo, esf, ctx, custo, est, idade) =>
@@ -149,8 +170,7 @@ function exemplos() {
   return {
     resumo: { ativas: 3, paradas: 1, custo_usd: 7.9, tokens_dia: 41.2e6, cota_5h: 34, cota_5h_reset: "19:10",
               cota_semana: 61, cota_semana_reset: "26/11 11:00", cota_modelo: "F:82%!" },
-    alertas: [{ tipo: "ctx", texto: "site-novo: contexto em 71% — hora de /compact ou handoff" },
-              { tipo: "cota", texto: "Cota do modelo em alerta: F:82%!" }],
+    alertas: [{ tipo: "ctx", nome: "site-novo", valor: 71 }, { tipo: "cotamodelo", valor: "F:82%!" }],
     sessoes: [s("site-novo", "site-novo", null, "Fable 5.2", "high", 71, 3.4, "ativa", 12),
               s(null, "wifi", "relatorios", "Opus 5.5", "medium", 22, 2.1, "ativa", 40),
               s("bot", "meubot", null, "Sonnet 5.5", "low", 9, .6, "ativa", 95),
@@ -171,7 +191,14 @@ async function carregar() {
 
 const nivel = p => p >= 80 ? "cr" : p >= 60 ? "al" : "";
 const fmtTok = n => n == null ? "—" : n >= 1e6 ? (n / 1e6).toFixed(1) + "M" : n >= 1e3 ? Math.round(n / 1e3) + "k" : String(n);
-const fmtIdade = s => s < 60 ? "agora" : s < 3600 ? Math.round(s / 60) + " min" : Math.round(s / 3600) + " h";
+const fmtIdade = s => s < 60 ? T("agora") : s < 3600 ? Math.round(s / 60) + " min" : Math.round(s / 3600) + " h";
+function textoAlerta(a) {
+  if (a.tipo === "ctx") return T("alCtx", { nome: a.nome, p: a.valor });
+  if (a.tipo === "cota5h") return T("al5h", { p: a.valor, r: a.reset || "?" });
+  if (a.tipo === "cotasemana") return T("alSemana", { p: a.valor });
+  if (a.tipo === "cotamodelo") return T("alModelo", { m: a.valor });
+  return a.texto || "";
+}
 function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 
 function desenhar() {
@@ -181,7 +208,7 @@ function desenhar() {
   lista.replaceChildren();
   if (!ses.length) {
     const li = el("li", "vazio");
-    li.innerHTML = 'Nenhuma sessão ainda. Ligue o retrato: <code>export STATUSLINE_RETRATO=1</code> antes de abrir o <code>claude</code>.';
+    li.append(T("vazio1") + " ", el("code", null, "export STATUSLINE_RETRATO=1"), " " + T("vazio2") + " ", el("code", null, "claude"), ".");
     lista.append(li);
   }
   for (const s of ses) {
@@ -189,7 +216,7 @@ function desenhar() {
     li.append(el("span", "ponto " + (s.estado === "parada" ? "parada" : ctx >= 60 ? "quente" : "")));
     const nome = el("span", "nome", s.nome || s.projeto || "?");
     if (s.ativo) { nome.append(" "); nome.append(el("span", "seta", "→ " + s.ativo)); }
-    li.append(nome, el("span", "rot", s.estado === "ativa" ? fmtIdade(s.idade_s) : "parada · " + fmtIdade(s.idade_s)));
+    li.append(nome, el("span", "rot", s.estado === "ativa" ? fmtIdade(s.idade_s) : T("parada") + " · " + fmtIdade(s.idade_s)));
     const det = el("div", "det");
     const par = (rot, v) => { const x = el("span"); x.append(rot + " "); x.append(el("b", null, v)); det.append(x); };
     par("", (s.modelo || "?") + (s.esforco ? "/" + s.esforco : ""));
@@ -200,36 +227,36 @@ function desenhar() {
     const b = el("div", "barrinha"), i = el("i", nivel(ctx)); i.style.width = Math.min(100, ctx) + "%"; b.append(i); li.append(b);
     lista.append(li);
   }
-  $("subSes").textContent = `${R.ativas ?? 0} ativa(s) · ${R.paradas ?? 0} parada(s) nas últimas 2 h`;
+  $("subSes").textContent = T("subSes", { a: R.ativas ?? 0, p: R.paradas ?? 0 });
 
   // núcleo
   const num = $("numeros"); num.replaceChildren();
   const caixa = (rot, v, al) => { const d = el("div", al ? "al" : ""); d.append(el("b", null, v), rot); num.append(d); };
-  caixa("ativas", String(R.ativas ?? 0));
+  caixa(T("cxAtivas"), String(R.ativas ?? 0));
   caixa("5 h", R.cota_5h == null ? "—" : R.cota_5h + "%", (R.cota_5h ?? 0) >= 80);
-  caixa("semana", R.cota_semana == null ? "—" : R.cota_semana + "%", (R.cota_semana ?? 0) >= 80);
-  caixa("US$ sessões", (R.custo_usd ?? 0).toFixed(2));
-  caixa("tokens hoje", fmtTok(R.tokens_dia));
+  caixa(T("cxSemana"), R.cota_semana == null ? "—" : R.cota_semana + "%", (R.cota_semana ?? 0) >= 80);
+  caixa(T("cxCusto"), (R.custo_usd ?? 0).toFixed(2));
+  caixa(T("cxTokens"), fmtTok(R.tokens_dia));
   const al = dados.alertas || [];
-  $("status").textContent = al.length ? al.length + " ponto(s) de atenção" : (R.ativas ? "tudo em ordem" : "nenhuma sessão ativa");
+  $("status").textContent = al.length ? T("stAtencao", { n: al.length }) : (R.ativas ? T("stOk") : T("stNenhuma"));
 
   // cotas
   const cotas = $("cotas"); cotas.replaceChildren();
   const trilho = (rot, p, reset) => {
     const c = el("div", "cota"), l = el("div", "lin");
-    l.append(el("span", null, rot + (reset ? " · reset " + reset : "")), el("b", null, p == null ? "—" : p + "%"));
+    l.append(el("span", null, rot + (reset ? " · " + T("reset") + " " + reset : "")), el("b", null, p == null ? "—" : p + "%"));
     const t = el("div", "trilho"), i = el("i", nivel(p ?? 0)); i.style.width = Math.min(100, p ?? 0) + "%"; t.append(i);
     c.append(l, t); cotas.append(c);
   };
-  trilho("5 horas", R.cota_5h, R.cota_5h_reset);
-  trilho("Semanal (todos os modelos)", R.cota_semana, R.cota_semana_reset);
+  trilho(T("c5h"), R.cota_5h, R.cota_5h_reset);
+  trilho(T("cSemana"), R.cota_semana, R.cota_semana_reset);
   if (R.cota_modelo) {
     const m = /^(\S+?):(\d+)%/.exec(R.cota_modelo);
-    trilho("Semanal do modelo " + (m ? m[1] : ""), m ? Number(m[2]) : null, null);
+    trilho(T("cModelo") + " " + (m ? m[1] : ""), m ? Number(m[2]) : null, null);
   }
   const ul = $("alertas"); ul.replaceChildren();
-  if (!al.length) ul.append(el("li", "vazio", "Nada pedindo você agora."));
-  for (const a of al) { const li = el("li"); li.append(el("span", "ponto quente"), el("span", "txt", a.texto)); ul.append(li); }
+  if (!al.length) ul.append(el("li", "vazio", T("nadaAgora")));
+  for (const a of al) { const li = el("li"); li.append(el("span", "ponto quente"), el("span", "txt", textoAlerta(a))); ul.append(li); }
   if (REDUZ) requestAnimationFrame(quadro);
 }
 
@@ -238,24 +265,24 @@ function dizer(txt) {
   $("resposta").textContent = "> " + txt;
   if (!voz || !("speechSynthesis" in window)) return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(txt); u.lang = "pt-BR";
-  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith("pt"));
+  const u = new SpeechSynthesisUtterance(txt); u.lang = LOCALE;
+  const v = speechSynthesis.getVoices().find(v => v.lang && v.lang.toLowerCase().startsWith(LANG));
   if (v) u.voice = v;
   speechSynthesis.speak(u);
 }
 function status() {
   if (!dados) return;
   const R = dados.resumo || {}, al = dados.alertas || [];
-  let t = `${R.ativas ?? 0} sessões ativas.`;
-  if (R.cota_5h != null) t += ` Cota de cinco horas em ${R.cota_5h} por cento.`;
-  if (R.cota_semana != null) t += ` Semanal em ${R.cota_semana} por cento.`;
-  t += al.length ? ` Atenção: ${al.map(a => a.texto).join(". ")}.` : " Nada pedindo você.";
+  let t = T("vzAtivas", { n: R.ativas ?? 0 });
+  if (R.cota_5h != null) t += " " + T("vz5h", { p: R.cota_5h });
+  if (R.cota_semana != null) t += " " + T("vzSemana", { p: R.cota_semana });
+  t += al.length ? " " + T("vzAtencao") + " " + al.map(textoAlerta).join(". ") + "." : " " + T("vzNada");
   dizer(t);
 }
 $("bStatus").onclick = status;
 $("bAtivas").onclick = () => { soAtivas = !soAtivas; $("bAtivas").classList.toggle("on", soAtivas); $("bAtivas").setAttribute("aria-pressed", soAtivas); desenhar(); };
 $("bFoco").onclick = () => { const on = document.body.classList.toggle("foco"); $("bFoco").classList.toggle("on", on); $("bFoco").setAttribute("aria-pressed", on); };
-$("voz").onclick = () => { voz = !voz; const b = $("voz"); b.textContent = "Voz: " + (voz ? "ligada" : "desligada"); b.classList.toggle("desl", !voz); b.setAttribute("aria-pressed", voz); if (voz) status(); };
+$("voz").onclick = () => { voz = !voz; const b = $("voz"); b.textContent = voz ? T("vozOn") : T("vozOff"); b.classList.toggle("desl", !voz); b.setAttribute("aria-pressed", voz); if (voz) status(); };
 document.addEventListener("keydown", e => {
   if (e.target.closest && e.target.closest("input,textarea")) return;
   ({ "1": () => $("bStatus").click(), "2": () => $("bAtivas").click(), "3": () => $("bFoco").click() })[e.key]?.();
@@ -264,8 +291,8 @@ document.addEventListener("keydown", e => {
 /* ---------- relógio ---------- */
 function relogio() {
   const d = new Date();
-  $("relogio").textContent = d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  $("data").textContent = d.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" });
+  $("relogio").textContent = d.toLocaleTimeString(LOCALE, { hour: "2-digit", minute: "2-digit" });
+  $("data").textContent = d.toLocaleDateString(LOCALE, { weekday: "short", day: "2-digit", month: "short" });
 }
 relogio(); setInterval(relogio, 15000);
 

@@ -59,6 +59,9 @@ class TestPainel(unittest.TestCase):
         self.assertNotIn("Cota semanal", textos)
         self.assertEqual(m["resumo"]["custo_usd"], 2.0)
         self.assertEqual(m["resumo"]["cota_5h"], 85)
+        tipos = {a["tipo"]: a for a in m["alertas"]}
+        self.assertEqual(set(tipos), {"ctx", "cota5h", "cotamodelo"})
+        self.assertEqual((tipos["ctx"]["nome"], tipos["ctx"]["valor"]), ("site", 72))
 
     def test_publico_corta_id_e_nao_vaza_campos(self):
         retrato(self.p, "aaaaaaaa-1111-2222", 5, segredo="nao-deveria-sair")

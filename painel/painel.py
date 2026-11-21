@@ -64,13 +64,17 @@ def montar(sessoes: list[dict]) -> dict:
     alertas = []
     for s in ctx_alto:
         nome = s.get("nome") or projeto(s)
-        alertas.append({"tipo": "ctx", "texto": f"{nome}: contexto em {s['ctx_pct']}% — hora de /compact ou handoff"})
+        alertas.append({"tipo": "ctx", "nome": nome, "valor": s["ctx_pct"],
+                        "texto": f"{nome}: contexto em {s['ctx_pct']}% — hora de /compact ou handoff"})
     if (_num(recente.get("cota_5h")) or 0) >= 80:
-        alertas.append({"tipo": "cota", "texto": f"Cota de 5 h em {recente['cota_5h']}% (reset {recente.get('cota_5h_reset') or '?'})"})
+        alertas.append({"tipo": "cota5h", "valor": recente["cota_5h"], "reset": recente.get("cota_5h_reset"),
+                        "texto": f"Cota de 5 h em {recente['cota_5h']}% (reset {recente.get('cota_5h_reset') or '?'})"})
     if (_num(recente.get("cota_semana")) or 0) >= 80:
-        alertas.append({"tipo": "cota", "texto": f"Cota semanal em {recente['cota_semana']}%"})
+        alertas.append({"tipo": "cotasemana", "valor": recente["cota_semana"],
+                        "texto": f"Cota semanal em {recente['cota_semana']}%"})
     if isinstance(recente.get("cota_modelo"), str) and recente["cota_modelo"].endswith("!"):
-        alertas.append({"tipo": "cota", "texto": f"Cota do modelo em alerta: {recente['cota_modelo']}"})
+        alertas.append({"tipo": "cotamodelo", "valor": recente["cota_modelo"],
+                        "texto": f"Cota do modelo em alerta: {recente['cota_modelo']}"})
     return {
         "gerado_em": int(time.time()),
         "resumo": {

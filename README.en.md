@@ -52,7 +52,7 @@ manually: copy the script to `~/.claude/statusline-command.sh` and add the block
 ## Dashboard (optional)
 
 With `STATUSLINE_RETRATO=1`, the statusline saves a small JSON file for each session in `~/.local/share/claude-session-kit/sessoes/` (no token). `python3 painel/painel.py` opens a screen at http://127.0.0.1:8781 with all sessions (context, model, cost, active project, accounts) and the account quota, with alerts when context exceeds 60% or quota exceeds 80%. Read-only; nothing is executed. Demo with sample data:
-https://inematds.github.io/claude-session-kit/painel/
+https://inematds.github.io/claude-session-kit/painel/?lang=en
 
 ```bash
 export STATUSLINE_RETRATO=1
